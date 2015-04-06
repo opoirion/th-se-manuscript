@@ -1,0 +1,780 @@
+\newpage
+\chapter{Classification supervisée}\label{chap6}\label{classifsupervisee}
+\lhead{\emph{Classification supervisée}} 
+
+   
+    Les résultats précédents de cette thèse ont montré l'existence de biais de distribution des gènes liés aux STIG selon le type de réplicons: chromosome, plasmide ou RECE. Cependant, pour certains réplicons extrachromosomiques, le statut d'essentialité pour l'hôte n'est pas clair et certains réplicons annotés ``plasmide" ont eu leur statut récemment révisé et sont désormais considérés comme essentiels pour leur hôte \citep{Landeta2011}. En se servant des annotations fonctionnelles comme attributs des réplicons, des analyses par classification supervisée sont donc conduites afin d'identifier des RECE potentiels parmi les plasmides. Ces analyses permettent, de plus, d'identifier des RECE se classant parmi les chromosomes, et inversement. 
+     
+
+\section{Jeux de données}
+	Plusieurs jeux d'apprentissage (\textit{training sets}) sont formés selon les annotations de RefSeq des réplicons:  ``chromosome", ``plasmide" et ``RECE", et des génomes: mono- ou multipartites. Les données sont de plus normées par genre pour éviter une sur-représentation de certains groupes taxonomiques.
+	\\
+Soit $E_{chr}$, $E_{plasmide}$, $E_{RECE}$, $E_{monopartite}$ et $E_{multipartite}$ les différents \textit{training sets}, définis par:
+\begin{description}
+	\item[$\mathbf{E_{chr}}$] L'ensemble des chromosomes normé par le genre de l'hôte. Ainsi $E_{chr}=K_{chr}$, avec $K_{chr}$ défini Table \ref{tabclassecaracter}.
+	\item$\mathbf{E_{RECE}}$ L'ensemble des RECE normé par le genre de l'hôte. Ainsi $E_{RECE}=K_{RECE}$, avec $K_{RECE}$ défini Table \ref{tabclassecaracter}.
+	 \item[$\mathbf{E_{plasmide}}$] Pour ne pas inclure des plasmides pouvant être de potentiels RECE, les résultats du clustering par INFOMAP (\S \ref{parresultatclustering}) ont été utilisés. Les plasmides au sein des clusters de la procédure $f_{INFOMAP}(V^{R})$ où sont également présents des réplicons de type ``RECE" ou ``chromosome" ne sont pas pris en compte. Soit $Cl_{INFOMAP}=f_{INFOMAP}(V^{R})$, le résultat du clustering par INFOMAP. $E_{plasmide}$ est défini par:
+		\begin{equation}
+			E_{plasmide}=\bar{V}^{R^{\{plasmide\}}_{classif}}_{f,genre}
+		\end{equation}
+	où $R^{\{plasmide\}}_{classif}$ est défini par:
+		\begin{equation}
+			R^{\{plasmide\}}_{classif}=\bigcup_{\substack{C \in Cl_{INFOMAP}\\\\C \cap R^{\{chr,RECE\}}=\emptyset}}C
+		\end{equation}
+	\item[$\mathbf{E_{monopartite}}$] L'ensemble des génomes monopartites ayant un seul réplicon essentiel (chromosome) normé par le genre de l'hôte. Ainsi $E_{monopartite}=K_{monopartite}$, avec $K_{monopartite}$ défini Table \ref{tabclassecaracter}.
+	\item[$\mathbf{E_{multipartite}}$] L'ensemble des génomes multipartites normé par le genre de l'hôte. Ainsi $E_{multipartite}=K_{multipartite}$, avec $K_{multipartite}$ défini Table \ref{tabclassecaracter}.
+\end{description} 
+\bigskip     
+
+\begin{table}[H]
+	\begin{center}
+\caption[Taille des ensembles formant les \textit{training sets}]{Taille des ensembles formant les \textit{training sets} utilisés pour les classifications supervisées.}\label{tablearningsize}
+	\begin{tabular}{c||c|c|c|c|c|c}
+	\textbf{Ensemble}&$E_{chr}$&$E_{RECE}$&$R^{\{plasmide\}}_{classif}$&$E_{plasmide}$&$E_{monopartite}$&$E_{multipartite}$\\
+	\hline
+	\textbf{Taille}& 548&31&2744&262&530&29\\
+	\end{tabular}
+\end{center}
+\end{table}
+
+
+
+\section{Algorithmes de classification}
+	Plusieurs approches méthodologiques de classification supervisée sont possibles. Les différents algorithmes utilisés dans notre étude sont ici brièvement présentés:
+
+\begin{longtable}{ @{\hspace{-2.2cm}} >{\bfseries}p{0.2\textwidth}|>{\small}p{\textwidth}}
+	\caption[Algorithmes de classification utilisés]{Principaux algorithmes de classification supervisée utilisés.}\label{tabalgoclassif}\\
+	Logistic \mbox{regression} & La fonction $f_{reg}^{E_{training}}$ définie dans l'éq. \ref{eqlogreg} peut être utilisée pour classer des observations $o \notin E_{training}$: si  $f_{reg}^{E_{training}}(o)>0.5$ alors $o \in E_{True}$ \citep{hosmer2013applied}.
+	\\[0.6cm]
+	Support \mbox{Vector} \mbox{Machine} (SVM) & \citep{cortes1995support} Ces ensembles d'algorithmes d'apprentissage supervisé ont pour objectif de définir un ou plusieurs hyperplans au sein d'un espace où sont représentées les observations, de façon à séparer au mieux les différentes classes d'observations. Ces hyperplans sont définis par rapport aux \textbf{vecteurs supports}, représentant les observations les plus proches des limites théoriques entre les classes. Un deuxième aspect important des SVM est que, dans le cas où les observations ne sont pas séparables linéairement dans l'espace de représentation, une fonction ``noyau" $f_{k}$ peut être utilisée afin de projeter les observations dans un espace de plus grande dimension où elles seront potentiellement séparables. Un exemple simple de $f_{k}$ est la fonction polynomiale: $f_{k}(x,y)=(\langle x,y\rangle+c)^{d}$, $x$ et $y$ étant deux vecteurs d'observations.  Le principe général et la méthodologie des SVM sont très bien détaillés dans \citep{hamel2011knowledge}. Les paramètres à définir sont, entre autres, $f_{k}$, les différents paramètres propres à $f_{k}$ ($c$ et $d$...) et le coût $Co$ de la pénalisation des observations incorrectement séparées par l'hyperplan.
+	\\[0.6cm]
+	Naive Bayes \mbox{classification} & \cite[p.219]{Larose2006} Soit une observation $o$ tirée d'un jeu de données $E=E_{1} \cup ... \cup E_{k}$ organisé en $k$ classes. En supposant que les attributs de $o$ sont indépendants conditionnellement, on peut estimer, à partir du théorème de Bayes, que la probabilité que $o$ appartienne à $E_{j}$ est proportionnelle à: 
+	  \begin{equation}      
+      	P(o \in E_{j}) \propto \prod_{i=1}^{|v_{o}|}P(v_{o}[i]|o \in E_{j}).P(E_{j}) 
+      \end{equation}
+      les probabilités $P(E_{j})$ (estimée par le ratio $\frac{|E_{j}|}{|E|}$)  et $P(v_{o}[i]|o \in E_{j})$ (estimée, par exemple, par la proportion du nombre d'observations $o'$ dans $E_{j}$ telles que $v_{o'}[i]=v_{o}[i]$) pouvant être facilement estimées à partir des données. $o$ appartient alors à la classe $E_{j}$ pour laquelle $P(o \in E_{j})$ est maximale. Les paramètres à considérer sont la spécification de potentielles relations de dépendance entre les attributs.
+	\\[0.6cm]
+	Arbres de \mbox{décision (AD)} & \citep{breiman1984classification} Le principe de ces algorithmes est de bâtir, en fonction d'un jeu de données, un arbre de décision effectuant une série de tests séquentiels pour une observation et aboutissant à l'attribution d'une classe pour cette observation. Succinctement, le principe est, pour la création de chaque nœud (ou embranchement), de choisir le couple Attribut/Valeur-seuil permettant de séparer au mieux le \textit{training set}. Les différentes stratégies permettant la conception d'arbres de décision sont détaillées dans \cite[p.281]{izenman2008modern}. Les paramètres de ces algorithmes sont, entre autres, le nombre maximal d'embranchements successifs de l'arbre, les modalités de création des nœuds de l'arbre (nombre minimum d'observations par embranchement, par coupure...) et les processus de raffinage (\textit{Tree pruning}). 
+	\\[0.6cm]
+	Random forest (RF) & \citep{Breiman2001} Cette procédure fait partie des \textit{méta}-classifieurs introduits \S \ref{parclassifrobust}. Le principe est de créer une forêt d'arbres dont chacun est réalisé par un échantillon de \textit{bootstrap} effectué sur les observations de $E_{training}$, similairement au principe du \textit{bagging}. Les arbres construits possèdent une part supplémentaire de hasard en choisissant aléatoirement, pour la construction de chaque \textit{noeud}, seulement un sous-ensemble d'attributs \cite[p.537]{izenman2008modern}. Cette procédure a pour effet de réduire la variance ainsi que le biais des résultats obtenus par un arbre de décision seul. Les paramètres sont, en plus de ceux propres aux arbres de décision, le nombre d'arbres de la forêt et la taille des sous-ensembles d'attributs.
+	\\[0.6cm]
+     Extremely \mbox{randomized} \mbox{trees (ERT)} & \citep{Geurts2006a} Cet algorithme est similaire à celui des \textit{Random Forest} mais utilise une part d'aléatoire encore plus importante. Pour chaque attribut testé lors de la création d'un nœud, la valeur seuil est tirée de façon aléatoire. Cela a pour effet de réduire davantage la variance mais augmente légèrement le biais de classification (ou taux d'erreur, \textit{c.f.} notion de décomposition \textit{biais-variance} \citep[p. 354]{witten2013data}).
+\end{longtable}
+
+	Lors de l'utilisation des algorithmes de type \textit{Ensemble} (\textit{Random Forest} et \textit{Extremely randomized trees}), un estimateur de performance, l'\textit{out-of-bag estimate} (ou $\mathbf{OOB_{score}}$), peut être calculé à partir des différents tirages de \textit{bootstrap} de chaque classifieur des procédures: pour chaque tirage de \textit{bootstrap}, une partie des observations (ou \textit{out-of-bag} (OOB)) ne sont pas choisies pour la construction de $E_{training}$. Ces observations peuvent ainsi servir de jeu de données test pour mesurer l'efficacité des classifieurs \cite[p.507]{izenman2008modern}. À partir des observations des OOB,  les importances des variables dans la classification des observations peuvent être calculées, en permutant une à une la valeur des attributs et en comparant le nouveau $OOB_{score}$ à celui obtenu sans permutation \citep{Breiman2001}\cite[p.543]{izenman2008modern}. Enfin, différentes méthodes peuvent servir à calculer la probabilité qu'une observation appartienne à une certaine classe selon, par exemple, la distance à laquelle celle-ci se trouve de l'hyperplan (SVM) \citep{ruping2004simple}. Pour les méthodes de type \textit{Ensemble}, une façon simple d'estimer ces probabilités est de considérer, pour une observation donnée, le rapport: $\frac{\textrm{nombre de classements dans la classe \textit{i}}}{\textrm{nombre total de classifieurs}}$ de la procédure. 
+
+
+
+\section{Procédures}\label{parprotocclassif}
+\subsection{Classification des plasmides}
+	Afin de détecter des réplicons annotés ``plasmide" mais susceptibles d'être des RECE, l'ensemble $V_{f}^{R^{\{plasmide,RECE\}}}$ des réplicons extra-chromosomiques est classé en utilisant $E_{learning}=\{E_{RECE},E_{plasmide}\}$ comme \textit{learning-set}. La différence de taille entre les deux sous-ensembles (Table \ref{tablearningsize}) peut entraîner un déséquilibre pour les résultats apportés par les classifieurs \citep[p.385]{han2012data} et grandement favoriser la classe ``plasmide" lors de la classification d'un réplicon.\\
+	Similairement à la démarche proposée par \cite[p.213]{Larose2006}, une seconde procédure de classification incluant une procédure d'échantillonnage aléatoire sans remise sur $R^{\{plasmide\}}_{classif}$ est alors conduite. Les étapes consistent à:
+\begin{description}
+	\item[1] Tirer un échantillon $R_{ech}$ de même taille que $R^{\{RECE\}}$ avec remise de $R^{\{plasmide\}}$ et le normer par genre: $E_{ech}=\bar{V}_{f,genre}^{R_{ech}}$.
+	\item[2] Effectuer la procédure de classification: $f_{classif}^{E_{training}}(V_{f}^{R^{\{plasmide,RECE\}}})$, sur l'ensemble des réplicons plasmidiques et RECE décrits fonctionnellement par: $V_{f}^{R^{\{plasmide,RECE\}}}$, avec $E_{training}=\{E_{chr},E_{ech}\}$.
+	\item[3] Effectuer les étapes \textbf{1} et \textbf{2} $n$ fois.
+	\item[4] Établir la moyenne des différents indices calculés pour les $n$ classifieurs: probabilités d'appartenir à une classe pour une observation donnée, scores obtenus pour les procédures de \textit{cross-validation}, scores $OOB_{estimate}$ obtenus pour les procédures de \textit{Random Forest} et \textit{Extremely randomized trees}, et scores d'importance pour les attributs. On peut alors estimer qu'une observation appartient à une classe donnée (``plasmide" ou ``RECE") si la majorité des classifieurs l'ont attribuée à cette classe.
+	\end{description}
+	Le $E_{learning}$ de cette procédure d'échantillonnage aléatoire sans remise est alors désigné par $\{E_{RECE},E_{plasmide}\}^{it}$. En omettant une partie des observations de $E_{plasmide}$ à chaque itération, cette procédure fait baisser la \textit{précision} du classifieur en augmentant le taux, $FP$, de faux-positifs détectés (``vrai" plasmides annotés ``RECE"). Elle augmente aussi vraisemblablement la variance des résultats du classifieur en rajoutant une part d'aléatoire: le tirage dans $E_{plasmide}$. Cependant, \textbf{en incluant un plus grand nombre de probables vrais RECE classés comme $TP$, cette procédure réduit le taux, $FN$, de faux-négatifs de l'analyse et accroît alors la sensibilité du classifieur} (\textit{c.f.} éq. \ref{eqsensitive}).
+
+\subsection{Classification des chromosomes} 
+	La classification des chromosomes a pour objectif d'étudier de potentiels chromosomes classés parmi les plasmides, ou plus généralement les réplicons extra-chromosomiques, et inversement s'il existe des réplicons extra-chromosomiques se classant parmi les chromosomes. Pour cela, deux procédures de classification $f_{classif}^{E_{training}}(V_{f}^{R^{\{plasmide,RECE,chr\}}})$ ont été réalisées en utilisant d'une part $E_{training}=\{E_{chr},E_{plasmide}\}$, et d'autre part $E_{training}=\{E_{chr},E_{RECE}\}^{it}$ qui, similairement à la classification des plasmides, désigne une procédure d'échantillonnage aléatoire sans remise, effectuée sur $R^{\{chr\}}$. 
+
+\subsection{Classification des génomes} 
+	Malgré les faibles biais détectés entre génomes multi- et monopartites dans l'analyse par régression logistique (Table \ref{tabreglogis}), les génomes de $\bar{V}^{G}_{f,genre}$ sont classés en utilisant $E_{training}=\{E_{multipartite},E_{monopartite}\}^{it}$ qui, similairement à la classification des plasmides désigne une procédure d'échantillonnage aléatoire sans remise effectuée sur $G^{\{monopartite\}}$. L'objectif est alors de détecter de potentiels génomes multipartites considérés comme monopartites  jusqu'à présent.
+	  
+
+
+\section{Sélection des algorithmes et des paramètres} 
+	  Afin d'identifier l'approche méthodologique optimale, les différents algorithmes de classification supervisée ont été appliqués à ces jeux de données (\S \ref{tabalgoclassif}).
+	  Pour chaque classification, une procédure de \textit{Cross-Validation} (CV) est réalisée par \textit{Stratified 10-folds}, suivant les recommandations de \citep[p.370]{han2012data}. $E_{training}$ est séparé en 10 partitions équilibrées par rapport aux proportions relatives des classes de $E_{training}$. Chaque partition sert ensuite de \textit{test set} par rapport aux neuf autres. Pour une partition $K=\{K_{1},...,K_{k}\}$ par \textit{K-Fold} d'un \textit{training set}, le $CV_{score}$ de la procédure désigne le pourcentage moyen de classification correcte, donnée par la procédure de CV pour chaque partition $K_{i}$ \cite[chap.9]{hamel2011knowledge}:
+
+\begin{equation}
+	CV_{score}=1-CV_{erreur}
+\end{equation}
+
+avec:
+
+\begin{equation}
+	CV_{erreur}=\frac{1}{k}\sum_{i=1}^{k}\frac{1}{|K_{i}|}Err(f_{classif}^{K\setminus K_{i}}(K_{i}))
+\end{equation}	   
+où $Err(f_{classif}^{K\setminus K_{i}}(K_{i}))$ désigne le nombre d'observations de $K_{i}$ classées incorrectement par $f_{classif}^{K\setminus K_{i}}$ et $K\setminus K_{i}=\{k|\;k \in K \wedge k \notin K_{i}\}$.\\
+
+	Pour les méthodes de type \textit{Ensemble}, l'$OOB_{score}$ est aussi reporté. Pour les procédures de classification incluant des échantillonnages aléatoires, $CV_{score}$ et $OOB_{score}$ désignent la moyenne des $CV_{score}$ et des $OOB_{score}$ obtenus pour chaque itération. Pour ces procédures, les écart-types $\sigma_{CV_{score}}$ et $\sigma_{OOB_{score}}$ sont aussi calculés.\\
+Les paramètres de SVM (kernel polynomial d'ordre 2 et $C=10$) sont choisis selon les $CV_{score}$ des classifications plasmide/RECE. De même, les paramètres par défaut des arbres de décision ont été utilisés car ils donnent de meilleurs $CV_{score}$. Le nombre d'arbres dans les procédures RF et ERT est fixé à 1000. Le nombre d'itérations $n$ des procédures d'échantillonnage est fixé à 100.\\
+	 
+\begin{table}[h]	  
+	 \caption[Comparaison des classifieurs pour la classification supervisée des réplicons]{Comparaison des classifieurs pour la classification supervisée des réplicons. \textbf{SVM}, \textit{Naive Bayes classification} (\textbf{Naive}), Arbre de décision (\textbf{AD}) \textit{Random Forest} (\textbf{RF}), \textit{Extra Randomised Trees} (\textbf{ERT}). \textit{Training sets}: $\{E_{RECE},E_{chr}\}^{it}$ et $\{E_{RECE},E_{plasmide}\}^{it}$ désignent les procédures itératives décrites (\textit{c.f.} \S \ref{parprotocclassif}).} \label{tabresclassif}
+	  \begin{small}
+	  \begin{tabular}{c>{\bfseries}c|c|c|c|c}
+	  $\mathbf{E_{training}}$&\textbf{Classifieur}& $CV_{score}$&$\sigma_{CV_{score}}$&$OOB_{score}$&$\sigma_{OOB_{score}}$\\
+	  \hline
+	  $\{E_{RECE},E_{plasmide}\}$ & SVM & 0.96 & - & - & - \\
+	   & Naive & 0.90 & -&- &- \\
+	   & AD & 0.96 & - & - & - \\
+	   & RF & 0.96 & - & 0.96 & - \\
+	   & ERT & 0.96 & - & 0.96 & - \\
+	  \hline
+	  $\{E_{RECE},E_{plasmide}\}^{it}$ & SVM & 0.90 & 0.03 & - & - \\
+	   & Naive & 0.83 & 0.03& - & - \\
+	   & AD & 0.85 & 0.04 & - & - \\
+	   & RF & 0.93 & 0.02 & 0.93 & 0.02 \\
+	   & ERT & 0.92 & 0.02 & 0.93 & 0.02 \\
+	  \hline
+	  $\{E_{chr},E_{plasmide}\}$ & SVM & 1.0 & - & - & - \\
+	   & Naive & 0.98 & - & - & - \\
+	   & AD & 1.0 & - & - & - \\
+	   & RF & 1.0 & -& 1.0 & - \\
+	   & ERT & 1.0 & - & 1.0 & - \\
+	  \hline
+	  $\{E_{RECE},E_{chr}\}^{it}$ & SVM & 0.93 & 0.02 & - & - \\
+	   & Naive & 0.87 & 0.01& - & - \\
+	   & AD & 0.95 & 0.02 & - & - \\
+	   & RF & 0.98 & 0.01 & 0.98 & 0.01 \\
+	   & ERT & 0.98 & 0 & 0.98 & 0.01 \\
+	  \hline
+	  $\{E_{monopartite},E_{multipartite}\}^{it}$ & SVM & 0.72 & 0.04 & - & - \\
+	   & Naive & 0.59 & 0.04 & - & - \\
+	   & AD & 0.68 & 0.04 & - & - \\
+	   & RF & 0.77 & 0.03 & 0.77 & 0.03 \\
+	   & ERT & 0.78 & 0.03 & 0.78 & 0.03 \\
+	  \end{tabular}
+	  \end{small}
+\end{table}
+	  
+	Les résultats obtenus sont très similaires sur les training set $\{E_{RECE},E_{plasmide}\}$, à l'exception du classifieur \textit{Naive} (Table \ref{tabresclassif}). Ces bonnes performances peuvent s'expliquer par la relative grande taille de $E_{plasmide}$ par rapport à $E_{RECE}$ et la facilité à classer les réplicons de type ``plasmide" parmi les plasmides. Ainsi, les faibles valeurs de $CV_{score}$ sont dues aux faibles valeurs des $Err(f_{classif}^{K\setminus K_{i}}(K_{i}))$ grâce à la large proportion d'observations ``plasmide" présentes dans les $K_{i}$. Les résultats obtenus sur $\{E_{RECE},E_{plasmide}\}^{it}$, bien qu'ayant des proportions comparables d'observations ``plasmide" et ``RECE", témoignent de la plus grande difficulté à classer les réplicons annotés ``RECE" dans la classe des RECE. Les scores obtenus pour les \textit{training sets}  $\{E_{RECE},E_{chr}\}^{it}$ et $\{E_{RECE},E_{plasmide}\}^{it}$ sont ainsi des meilleurs indicateurs de performance pour la classification des RECE. \\
+	Sur ces training sets, les classifieurs RF et ERT donnent les résultats les plus performants par comparaison aux résultats de SVM, Naive et AD. Cette constatation est confirmée par le résultat d'un test de Kolmogorov-Smirnov entre les distributions de $CV_{score}$ de SVM et de RF et ERT, respectivement  ($p_{value} << 0.05$). Les résultats de RF et ERT ne sont cependant pas significativement différents ($p_{value} > 0.05$). Enfin, les résultats de la classification de $\{E_{monopartite},E_{multipartite}\}^{it}$ mettent en évidence une faible efficacité des classifieurs dans la séparation  génome multi/monopartite.
+	  
+
+
+\section{Logiciels utilisés}
+\begin{description}
+	  \item[Scikit-learn] Les classifieurs \textit{SVC}, \textit{GaussianNB}, \textit{DecisionTreeClassifier}, \textit{RandomForestClassifier}, \textit{ExtraTreesClassifier} de la librairie Python, Scikit-learn ont été utilisés. Les probabilités des classes pour les observations, les $OOB_{score}$, et les importances des attributs ont été calculées avec les fonctions \textit{predict\_proba}, \textit{oob\_score\_}, \textit{feature\_importances\_},  pour chaque procédure RF et ERT.
+	  \item[Python] a été utilisé pour la réalisation des \textit{pipelines} analytiques, du traitement des données et des procédures CV.
+	  \item[R] a été utilisé pour faire les tests d'hypothèses (Kolmogorov-Smirnov).
+\end{description}
+	  	  
+
+
+\section{Résultats et discussion}	 
+	  Le classifieur ERT a été choisi pour ses performances en comparaison aux classifieurs SVM, Naive et AD, ainsi que pour sa capacité à être plus généralisable que RF \citep{Geurts2006a}. Ce classifieur a été utilisé pour les procédures de classification des plasmides, chromosomes et génomes décrites précédemment.\\
+\\
+ $\bullet$ \textbf{Les résultats élevés obtenus pour les $CV_{score}$ et les $OOB_{score}$ des différents classifieurs montrent l'efficacité des STIG dans la discrimination des réplicons selon leur type} (Table \ref{tabresclassif}). Les scores très élevés obtenus pour la classification chromosome/plasmide des réplicons souligne les différences fonctionnelles de la répartition des STIG chez ces deux types d'élément. La discrimination RECE/plasmide apparaît plus ambiguë en présentant des scores plus faibles (Table \ref{tabresclassif}). Cependant, de façon générale, \textbf{\color{orange}les probabilités élevées obtenues en moyenne dans la classification des RECE dans leur classe respective atteste de la pertinence d'utiliser les STIG pour la différentiation de ces éléments génomiques}.\\  
+
+$\bullet$ \textbf{Ces analyses ont permis d'identifier de potentiels RECE parmi les plasmides} (Table \ref{tabclassifplasmid}). Le détail de ces RECE est discuté plus loin (\S  \ref{neorece}). Néanmoins, compte tenu des nombreux éléments de la littérature existante suggérant qu'une part importante de ces réplicons présente des caractèristiques de ``RECE" , \textbf{\color{orange} la pertinence de ces procédures de classification est confirmée}.\\
+
+	  
+%\scalebox{0.45}{
+	  \begin{landscape}
+	  \thispagestyle{empty}
+	  \begin{table}
+	  \begin{minipage}[t]{0.4\textwidth}
+	  \vspace{-3.5cm}
+	  	 \begin{tiny}
+	  	 	  \hspace{-2cm}
+	  \begin{tabular}{c>{\itshape}c>{\bfseries}c}
+\multicolumn{1}{l}{\textbf{Actinobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Actinomycetales}}\\
+NC\_016113&S. cattleya NRRL 8057&0.727\\
+NC\_017585&S. cattleya NRRL 8057&0.702\\
+NC\_011879&A. chlorophenolicus A6&0.648\\
+NZ\_CM001019&S. clavuligerus ATCC 27064&0.642\\
+NZ\_CM000914&S. clavuligerus ATCC 27064&0.642\\
+\multicolumn{1}{l}{\textbf{Alphabacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Rhizobiales}}\\
+NC\_017323&S. meliloti BL225C&0.961\\
+NC\_018701&S. meliloti Rm41&0.96\\
+NC\_003078&S. meliloti 1021&0.949\\
+NC\_017326&S. meliloti SM11&0.947\\
+NC\_009620&S. medicae WSM419&0.942\\
+NC\_018683&S. meliloti Rm41&0.922\\
+NC\_016815&S. fredii HH103&0.915\\
+NC\_012586&S. fredii NGR234&0.894\\
+NC\_017327&S. meliloti SM11&0.877\\
+NC\_017324&S. meliloti BL225C&0.85\\
+NC\_009621&S. medicae WSM419&0.836\\
+NC\_003037&S. meliloti 1021&0.818\\
+NC\_010997&R. etli CIAT 652&0.792\\
+NC\_011368&R. leguminosarum bv. trifolii WSM2304&0.777\\
+NC\_012858&R. leguminosarum bv. trifolii WSM1325&0.741\\
+NC\_008384&R. leguminosarum bv. viciae 3841&0.731\\
+NC\_007765&R. etli CFN 42&0.725\\
+NC\_008378&R. leguminosarum bv. viciae 3841&0.718\\
+NC\_012848&R. leguminosarum bv. trifolii WSM1325&0.711\\
+NC\_010998&R. etli CIAT 652&0.701\\
+NC\_011366&R. leguminosarum bv. trifolii WSM2304&0.63\\
+NC\_015184&A. sp. H13-3&0.565\\
+NC\_007766&R. etli CFN 42&0.555\\
+NC\_012811&M. extorquens AM1&0.538\\
+\multicolumn{1}{l}{\textbf{Rhodospirillales}}\\
+NC\_016594&A. brasilense Sp245&0.878\\
+NC\_017958&T. mobilis KA081020-065&0.797\\
+NC\_013855&A. sp. B510&0.732\\
+NC\_016585&A. lipoferum 4B&0.722\\
+NC\_016587&A. lipoferum 4B&0.645\\
+NC\_016586&A. lipoferum 4B&0.609\\
+NC\_016595&A. brasilense Sp245&0.603\\
+NC\_016618&A. brasilense Sp245&0.591\\
+NC\_017966&T. mobilis KA081020-065&0.578\\
+NC\_013857&A. sp. B510&0.545\\
+NC\_013858&A. sp. B510&0.53\\
+\multicolumn{1}{l}{\textbf{Rhodobacterales}}\\
+NC\_008688&P. denitrificans PD1222&0.769\\
+NC\_008043&R. sp. TM1040&0.667\\
+\multicolumn{1}{l}{\textbf{Sphingomonadales}}\\
+NC\_015583&N. sp. PP1Y&0.523\\
+\multicolumn{1}{l}{\textbf{Betaproteobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Burkholderiales}}\\
+NC\_007974&C. metallidurans CH34&0.883\\
+NC\_017575&R. solanacearum Po82&0.865\\
+NC\_003296&R. solanacearum GMI1000&0.861\\
+NC\_016626&B. sp. YI23&0.846\\
+NC\_014310&R. solanacearum PSI07&0.827\\
+NC\_010625&B. phymatum STM815&0.733\\
+NC\_018696&B. phenoliruptrix BR3459a&0.663\\
+NC\_015727&C. necator N-1&0.575\\
+NC\_007336&R. eutropha JMP134&0.513\\
+\multicolumn{1}{l}{\textbf{Clostridia}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Clostridiales}}\\
+NC\_012654&C. botulinum Ba4 str. 657&0.531\\
+NC\_010418&C. botulinum A3 str. Loch Maree&0.531\\
+\multicolumn{1}{l}{\textbf{Cyanobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Chroococcales}}\\
+NC\_009927&A. marina MBIC11017&0.582\\
+NC\_009926&A. marina MBIC11017&0.578\\
+\multicolumn{1}{l}{\textbf{Gammaproteobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Enterobacteriales}}\\
+NC\_014838&P. sp. At-9b&0.527\\
+\multicolumn{1}{l}{\textbf{Hadobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Deinococcales}}\\
+NC\_017805&D. gobiensis I-0&0.812\\
+NC\_008010&D. geothermalis DSM 11300&0.622\\
+\multicolumn{1}{l}{\textbf{Thermales}}\\
+NC\_017588&T. thermophilus JL-18&0.557\\
+NC\_006462&T. thermophilus HB8&0.505\\
+\end{tabular}
+	  \end{tiny}
+	  \subcaption{Classification $\{E_{RECE},E_{plasmide}\}$}\label{tabclassifrece1}
+	  \end{minipage}
+	  \hspace{2cm}
+	 \begin{minipage}[t]{0.5\textwidth}
+	 	  \centering
+	 	  \vspace{-3.5cm}
+	  	 \begin{tiny}
+	  	 	  %\hspace{2cm}
+	  \begin{tabular}{c>{\itshape}c>{\bfseries}c}
+	 \multicolumn{1}{l}{\textbf{Cyanobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Chroococcales}}\\
+NC\_009927&A. marina MBIC11017&0.906\\
+NC\_009926&A. marina MBIC11017&0.854\\
+NC\_009928&A. marina MBIC11017&0.742\\
+NC\_011737&C. sp. PCC 7424&0.61\\
+NC\_010474&S. sp. PCC 7002&0.602\\
+NC\_011738&C. sp. PCC 7424&0.55\\
+NC\_014534&C. sp. PCC 7822&0.53\\
+\multicolumn{1}{l}{\textbf{Nostocales}}\\
+NC\_010632&N. punctiforme PCC 73102&0.758\\
+NC\_007412&A. variabilis ATCC 29413&0.658\\
+\multicolumn{1}{l}{\textbf{Deferribacteres}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Deferribacterales}}\\
+NC\_013940&D. desulfuricans SSM1&0.618\\
+\multicolumn{1}{l}{\textbf{Gammaproteobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Enterobacteriales}}\\
+NC\_015062&R. sp. Y9602&0.688\\
+NC\_017060&R. aquatilis HX2&0.631\\
+NC\_014838&P. sp. At-9b&0.545\\
+\multicolumn{1}{l}{\textbf{Acidithiobacillales}}\\
+NC\_015851&A. caldus SM-1&0.655\\
+\multicolumn{1}{l}{\textbf{Hadobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Deinococcales}}\\
+NC\_017805&D. gobiensis I-0&0.901\\
+NC\_008010&D. geothermalis DSM 11300&0.853\\
+NC\_015169&D. proteolyticus MRP&0.751\\
+NC\_012528&D. deserti VCD115&0.703\\
+NC\_012529&D. deserti VCD115&0.654\\
+NC\_017791&D. gobiensis I-0&0.619\\
+NC\_017771&D. gobiensis I-0&0.608\\
+NC\_012527&D. deserti VCD115&0.607\\
+NC\_000958&D. radiodurans R1&0.589\\
+\multicolumn{1}{l}{\textbf{Thermales}}\\
+NC\_017588&T. thermophilus JL-18&0.756\\
+NC\_017273&T. thermophilus SG0.5JP17-16&0.734\\
+NC\_006462&T. thermophilus HB8&0.606\\
+NC\_019387&T. oshimai JL-2&0.564\\
+\multicolumn{1}{l}{\textbf{Actinobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Actinomycetales}}\\
+NC\_016113&S. cattleya NRRL 8057&0.827\\
+NC\_017585&S. cattleya NRRL 8057&0.811\\
+NZ\_CM001019&S. clavuligerus ATCC 27064&0.716\\
+NZ\_CM000914&S. clavuligerus ATCC 27064&0.716\\
+NC\_011879&A. chlorophenolicus A6&0.671\\
+NC\_003903&S. coelicolor A3(2)&0.552\\
+NC\_008269&R. jostii RHA1&0.543\\
+\multicolumn{1}{l}{\textbf{Thermomicrobia)}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Thermomicrobiales}}\\
+NC\_011961&T. roseum DSM 5159&0.529\\
+\multicolumn{1}{l}{\textbf{Bacilli}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Bacillales}}\\
+NC\_011339&B. cereus H3081.97&0.619\\
+NC\_010921&B. cereus&0.594\\
+NC\_010916&B. cereus&0.594\\
+NC\_011777&B. cereus AH820&0.594\\
+NC\_010180&B. weihenstephanensis KBAB4&0.58\\
+NC\_018689&B. thuringiensis MC28&0.557\\
+NC\_018688&B. thuringiensis MC28&0.55\\
+NC\_011775&B. cereus G9842&0.512\\
+	  \end{tabular}
+	  \end{tiny}
+	  
+	  	 \subcaption{Classification  $\{E_{RECE},E_{plasmide}\}^{it}$}\label{tabclassifrece2}
+	  	 
+	  \end{minipage}
+	  \hspace{2cm}
+	  \begin{minipage}[t]{0.5\textwidth}
+	  \centering
+	 	  \vspace{-3.5cm}
+	  	 \begin{tiny}
+	  \begin{tabular}{c>{\itshape}c>{\bfseries}c}
+	  \multicolumn{1}{l}{\textbf{Alphabacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Rhizobiales}}\\
+NC\_018701&S. meliloti Rm41&0.955\\
+NC\_017323&S. meliloti BL225C&0.952\\
+NC\_017326&S. meliloti SM11&0.947\\
+NC\_009620&S. medicae WSM419&0.946\\
+NC\_003078&S. meliloti 1021&0.934\\
+NC\_018683&S. meliloti Rm41&0.893\\
+NC\_012586&S. fredii NGR234&0.884\\
+NC\_016815&S. fredii HH103&0.877\\
+NC\_017324&S. meliloti BL225C&0.862\\
+NC\_009621&S. medicae WSM419&0.859\\
+NC\_017327&S. meliloti SM11&0.833\\
+NC\_003037&S. meliloti 1021&0.786\\
+NC\_011368&R. leguminosarum bv. trifolii WSM2304&0.745\\
+NC\_012811&M. extorquens AM1&0.743\\
+NC\_012858&R. leguminosarum bv. trifolii WSM1325&0.715\\
+NC\_010997&R. etli CIAT 652&0.711\\
+NC\_008384&R. leguminosarum bv. viciae 3841&0.693\\
+NC\_007765&R. etli CFN 42&0.692\\
+NC\_010998&R. etli CIAT 652&0.678\\
+NC\_012848&R. leguminosarum bv. trifolii WSM1325&0.675\\
+NC\_008378&R. leguminosarum bv. viciae 3841&0.647\\
+NC\_011366&R. leguminosarum bv. trifolii WSM2304&0.634\\
+NC\_007766&R. etli CFN 42&0.55\\
+\multicolumn{1}{l}{\textbf{Rhodospirillales}}\\
+NC\_016594&A. brasilense Sp245&0.91\\
+NC\_017958&T. mobilis KA081020-065&0.884\\
+NC\_016586&A. lipoferum 4B&0.85\\
+NC\_016585&A. lipoferum 4B&0.843\\
+NC\_013855&A. sp. B510&0.812\\
+NC\_016587&A. lipoferum 4B&0.809\\
+NC\_013858&A. sp. B510&0.791\\
+NC\_016595&A. brasilense Sp245&0.743\\
+NC\_016596&A. brasilense Sp245&0.727\\
+NC\_016618&A. brasilense Sp245&0.716\\
+NC\_013857&A. sp. B510&0.68\\
+NC\_017957&T. mobilis KA081020-065&0.643\\
+NC\_017966&T. mobilis KA081020-065&0.63\\
+NC\_016623&A. lipoferum 4B&0.591\\
+NC\_013856&A. sp. B510&0.582\\
+\multicolumn{1}{l}{\textbf{Rhodobacterales}}\\
+NC\_008688&P. denitrificans PD1222&0.816\\
+NC\_008043&R. sp. TM1040&0.715\\
+\multicolumn{1}{l}{\textbf{Sphingomonadales}}\\
+NC\_015583&N. sp. PP1Y&0.622\\
+NC\_009507&S. wittichii RW1&0.616\\
+NC\_014007&S. japonicum UT26S&0.569\\
+\multicolumn{1}{l}{\textbf{Caulobacter group}}\\
+NC\_010335&C. sp. K31&0.506\\
+\multicolumn{1}{l}{\textbf{Clostridia}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Clostridiales}}\\
+NC\_012780&E. eligens ATCC 27750&0.711\\
+NC\_014824&R. albus 7&0.625\\
+NC\_012654&C. botulinum Ba4 str. 657&0.604\\
+NC\_010418&C. botulinum A3 str. Loch Maree&0.59\\
+NC\_014390&B. proteoclasticus B316&0.566\\
+NC\_012219&C. botulinum&0.515\\
+NC\_012946&C. botulinum D str. 1873&0.515\\
+\multicolumn{1}{l}{\textbf{Betaproteobacteria}}\\
+\hline
+\multicolumn{1}{l}{\textbf{Burkholderiales}}\\
+NC\_003296&R. solanacearum GMI1000&0.936\\
+NC\_014310&R. solanacearum PSI07&0.922\\
+NC\_007974&C. metallidurans CH34&0.919\\
+NC\_017575&R. solanacearum Po82&0.915\\
+NC\_018696&B. phenoliruptrix BR3459a&0.833\\
+NC\_016626&B. sp. YI23&0.805\\
+NC\_010625&B. phymatum STM815&0.748\\
+NC\_015727&C. necator N-1&0.724\\
+NC\_010627&B. phymatum STM815&0.661\\
+NC\_007336&R. eutropha JMP134&0.584\\
+NC\_010529&C. taiwanensis&0.562\\
+NC\_014120&B. sp. CCGE1002&0.513\\
+	  \end{tabular}
+	  \end{tiny}
+	  	 \subcaption{Classification  $\{E_{RECE},E_{plasmide}\}^{it}$ (suite)}\label{tabclassifrece3}
+	  \end{minipage}
+	  \end{table}
+\end{landscape}
+
+
+\begin{table}[H]
+\captionof{table}[Plasmides classés comme RECE]{Plasmides classés comme RECE par la procédure de classification $f_{ERT}^{E_{training}}(V_{f}^{R^{\{plasmide,RECE\}}})$ avec $E_{training}=\{E_{RECE},E_{plasmide}\}$ (\ref{tabclassifrece1}) et $E_{training}=\{E_{RECE},E_{plasmide}\}^{it}$ (\ref{tabclassifrece2} et \ref{tabclassifrece3}). \\ Première colonne: numéro d'accession \textit{RefSeq} du réplicon, deuxième colonne: espèce-hôte du réplicon, dernière colonne: probabilité d'appartenance à la classe "RECE". }\label{tabclassifplasmid}
+\end{table}
+
+$\bullet$ \textbf{Les STIG ne permettent de discriminer que partiellement certains RECE.} Pour les RECE de certains lignées (\textit{Leptospira} notamment), les STIG utilisés ne permettent pas d'identifier clairement ces réplicons comme des RECE, une partie de ceux-ci pouvant se classer préférentiellement dans la classe ``plasmide" et/ou avoir une faible probabilité d'appartenance à la classe ``RECE" (Table \ref{tabrecemean}). 
+
+\begin{table}[H]
+	\caption[Probabilités des RECE d'appartenir à la classe ``RECE"]{Moyenne, par genre bactérien, des probabilités des RECE d'appartenir à la classe ``RECE" obtenues par la procédure de classification: $f_{ERT}^{E_{training}}(V_{f}^{R^{\{RECE\}}})$ avec $E_{training}=\{E_{RECE},E_{plasmide}\}^{it}$}.\label{tabrecemean}
+	\begin{minipage}[t]{0.5\textwidth}
+		\small
+		\vspace{0cm}
+		\centering
+		\begin{tabular}{>{\itshape}c>{\bfseries}c}
+			Paracoccus&0.96\\
+			Ochrobactrum&0.96\\
+			Ralstonia&0.95\\
+			Asticcacaulis&0.95\\
+			Photobacterium&0.95\\
+			Cupriavidus&0.94\\
+			Anabaena&0.94\\
+			Prevotella&0.92\\
+			Brucella&0.92\\
+			Pseudoalteromonas&0.91\\
+			Nocardiopsis&0.90\\
+			Sinorhizobium&0.90\\
+			Agrobacterium&0.90\\
+			Burkholderia&0.89\\
+		\end{tabular}
+	\end{minipage}
+	\begin{minipage}[t]{0.5\textwidth}
+	\small
+	\vspace{0cm}
+	\centering
+		\begin{tabular}{>{\itshape}c>{\bfseries}c}
+			Chloracidobacterium&0.88\\
+			Ilyobacter&0.88\\
+			Sphaerobacter&0.88\\
+			Aliivibrio&0.87\\
+			Cyanothece&0.86\\
+			Butyrivibrio&0.83\\
+			Variovorax&0.83\\
+			Deinococcus&0.78\\
+			Thermobaculum&0.78\\
+			Vibrio&0.76\\
+			Sphingobium&0.73\\
+			Rhodobacter&0.69\\
+			Leptospira&0.54\\
+		\end{tabular}
+	\end{minipage}
+\end{table}
+
+	Il est possible que les gènes liés aux STIG de ces génomes sont présent dans l'analyse en nombre insuffisant, cas des génomes de \textit{Leptospira}, par exemple. On peut néanmoins souligner que, malgré le faible nombre d'attributs (six, \textit{cf.} \S \ref{graphres}) décrivant les RECE de \textit{Leptospira}, certains attributs, annotés ParA et ParB chromosomiques notamment, sont relativement caractéristiques d'un état non-plasmidique. Pour les RECE des \textit{Vibrionaceae}, les protéines RtcB, spécifiques des RECE de cette famille, n'ont pas été prises en compte du fait de leur stricte spécificité envers cette famille bactérienne. Certaines structures spécifiques liées aux STIG non prises en compte (position et caractéristiques structurelles d'\textit{ori} par exemple) pourraient être les clés pour permettre la discrimination de ces réplicons, (\textit{cf.} \S \ref{chrIIori}). \\
+
+$\bullet$ \textbf{Une très faible part (huit) des réplicons extra-chromosomiques se classent comme ``chromosome"} (Table \ref{tabclassifrec}). Parmi eux, se retouvent les RECE de \textbf{\textit{Asticcacaulis, Paracoccus}} et \textbf{\textit{Prevotella}}, confirmant les biais marqués observés pour la distribution des gènes des STIG de ces réplicons.
+
+\begin{table}[H]
+	\caption[Réplicons extra-chromosomiques classés comme chromosome]{Réplicons extra-chromosomiques classés comme chromosome par la procédure $f_{ERT}^{E_{training}}(V_{f}^{R^{\{RECE,plasmide\}}})$ avec $E_{training}=\{E_{chr},E_{plasmide}\}$. }\label{tabclassifrec}
+	\begin{footnotesize}
+	\begin{tabular}{c>{\itshape}cc>{\bfseries}c}
+		\multicolumn{1}{l}{\textbf{ACTINOBACTERIES}}\\
+		\hline
+		\multicolumn{1}{l}{\textbf{Actinomycetales}}\\
+		NC\_014211 & N. dassonvillei \textnormal{subsp.} dassonvillei \textnormal{DSM 43111} & RECE & 0.539\\
+		\\[0.6cm]
+		\multicolumn{1}{l}{\textbf{ALPHAPROTEOBACTERIES}}\\
+		\hline
+		\multicolumn{1}{l}{\textbf{Caulobacterales}}\\
+		NC\_014817 & A. excentricus \textnormal{CB 48} & RECE & 0.637\\
+		\multicolumn{1}{l}{\textbf{Rhizobiales}}\\
+		NC\_012811 & M extorquens \textnormal{AM1} & plasmide & 0.669\\
+		\multicolumn{1}{l}{\textbf{Rhodobacterales}}\\
+		NC\_008687 & P. denitrificans \textnormal{PD1222} & RECE & 0.778\\
+		\multicolumn{1}{l}{\textbf{Rhodospirillales}}\\
+		NC\_016594 & A. brasilense \textnormal{Sp245} & plasmide & 0.774\\
+		\\[0.6cm]
+		\multicolumn{1}{l}{\textbf{BACTEROIDETES}}\\
+		\hline
+		\multicolumn{1}{l}{\textbf{Bacteroidales}}\\
+		NC\_017861 & P. intermedia \textnormal{17} & RECE & 0.984\\
+		NC\_014371 & P. melaninogenica \textnormal{ATCC 25845} & RECE & 0.698\\
+		\\[0.6cm]
+		\multicolumn{1}{l}{\textbf{CYANOBACTERIES}}\\
+		\hline
+		\multicolumn{1}{l}{\textbf{Nostocales}}\\
+		NC\_019439 & A. \textnormal{sp. 90} & RECE & 0.638\\
+	\end{tabular}
+	\end{footnotesize}
+\end{table}
+
+Néanmoins, seul le RECE de \textit{P. intermedia} présente une probabilité très importante ($P>0.98$) qui peut être expliquée par la structure particulière du génome de \textit{P. intermedia 17} (\textit{cf.} \S \ref{parprev}). La présence du RECE de \textit{N. dassonvillei} dans le groupe ``chromosome" est très peu significative ($P<0.54$). La présence, avec une faible probabilité, de mégaplasmides de \textit{Methylbacterium extorquens} et \textit{Azospirillum} est due au fait qu'ils comportent des gènes codant pour des protéines, annotées DnaG, DnaB, ParC ou ParE entre autres, qui sont très inhabituelles pour des réplicons extrachromosomiques (Table \ref{tabreglogis}). Ces réplicons sont de plus identifiés comme de potentiels ``RECE" avec une forte probabilité pour \textit{Azospirillum} mais une probabilité non significative pour \textit{M. extorquens}.\\
+Enfin, à l'exception du chromosome de \textit{P. intermedia 17}, aucun chromosome n'est classé dans la classe ``plasmide" (résultats non montrés). 
+	  
+ $\bullet$ \textbf{Les attributs les plus discriminants dans la classification RECE/plasmide (Table \ref{tabvarimportance}) sont similaires à ceux identifiés comme ``significatifs" dans l'analyse par régression logistique} (Table \ref{tabreglogis}). Des résultats comparables sont de plus observés pour les classifications obtenues avec les autres training-sets (résultats non montrés). Ces résultats confirment le pouvoir discriminant de certaines fonctions des STIG (\textit{cf.} \S \ref{reglogresult}) dans la séparation des réplicons selon leur type.\\
+ 
+\begin{table}[H]
+	\begin{minipage}{\textwidth}
+	\caption[Importance des attributs fonctionnels des observations de $E_{training}$ dans la classification RECE/plasmide]{Importance des attributs fonctionnels dans la procédure de classification $f_{ERT}^{E_{training}}$ avec $E_{training}=\{E_{RECE},E_{plasmide}\}^{it}$. }\label{tabvarimportance}
+	\end{minipage}
+\hspace*{-2cm}
+\begin{minipage}[t]{0.3\textwidth}
+\vspace{0cm}
+\centering
+\begin{scriptsize}
+\begin{tabular}{c>{\bfseries}c}
+Fonction & Score$^{a}$\\
+\hline
+\\[-0.2cm]
+kegg\_ftsE&0.1016\\
+kegg\_acrA&0.0733\\
+kegg\_parA\_soj&0.0696\\
+kegg\_hupB&0.0556\\
+kegg\_lrp&0.0529\\
+kegg\_rob&0.0492\\
+kegg\_minD&0.0478\\
+kegg\_iciA&0.0424\\
+kegg\_ftsI&0.0392\\
+kegg\_xerC&0.0258\\
+aclame\_ATPase/tyrK/exoP&0.0243\\
+kegg\_cbpA&0.0238\\
+kegg\_xerD&0.0227\\
+kegg\_mrp&0.0223\\
+kegg\_mreB&0.0209\\
+kegg\_parB\_spo0J&0.0175\\
+aclame\_RuvB&0.0162\\
+kegg\_E3.5.1.28B\_amiA\_amiB\_amiC&0.0151\\
+aclame\_ParB&0.0145\\
+kegg\_minC&0.0139\\
+kegg\_minE&0.0137\\
+kegg\_ftsX&0.0132\\
+aclame\_FtsK/SpoIIIE&0.0105\\
+aclame\_XerTyrosine&0.0102\\
+aclame\_Helicase&0.0101\\
+aclame\_PSK\_HicAB&0.0099\\
+kegg\_ftsW\_spoVE&0.0097\\
+aclame\_PSK\_parDE&0.0094\\
+aclame\_DNArepair&0.0083\\
+aclame\_ParA/ParM&0.0083\\
+aclame\_serinerecombinase&0.0082\\
+kegg\_fic&0.0080\\
+aclame\_PLdimerresolution&0.0077\\
+kegg\_dnaB&0.0071\\
+aclame\_RepC&0.0064\\
+aclame\_PSK\_vapBC/vag&0.0058\\
+aclame\_TyrosinerecOrfA&0.0052\\
+kegg\_scpB&0.0051\\
+aclame\_PSK\_higBA&0.0048\\
+\end{tabular}
+\end{scriptsize}
+\end{minipage}
+\hspace{2cm}
+\begin{minipage}[t]{0.3\textwidth}
+\vspace{0cm}
+\centering
+\begin{scriptsize}
+\begin{tabular}{c>{\bfseries}c}
+Fonction & Score$^{a}$\\
+\hline
+\\[-0.2cm]
+aclame\_DNAhelicase&0.0048\\
+kegg\_dps&0.0046\\
+kegg\_ftsA&0.0044\\
+kegg\_ssb&0.0042\\
+kegg\_parC&0.0038\\
+aclame\_XerD&0.0037\\
+kegg\_parE&0.0034\\
+kegg\_ihfB\_himD&0.0034\\
+kegg\_hns&0.0033\\
+kegg\_dnaC&0.0032\\
+kegg\_dam&0.0032\\
+kegg\_ftsK\_spoIIIE&0.0031\\
+kegg\_rodA\_mrdB&0.0028\\
+aclame\_PSK\_epsilon-zeta&0.0027\\
+kegg\_sulA&0.0026\\
+aclame\_PSK\_relBE&0.0025\\
+aclame\_PSK\_phD-doc&0.0025\\
+kegg\_hfq&0.0023\\
+aclame\_RepA&0.0023\\
+aclame\_RepA\_E\_B&0.0023\\
+kegg\_dnaG&0.0019\\
+kegg\_slmA\_ttk&0.0019\\
+kegg\_ftsZ&0.0019\\
+kegg\_scpA&0.0019\\
+kegg\_dnaA&0.0017\\
+aclame\_CopG&0.0017\\
+aclame\_TrfA&0.0016\\
+aclame\_PSK\_mazEF&0.0016\\
+aclame\_primase\_LtrC&0.0011\\
+kegg\_tus\_tau&0.0011\\
+aclame\_DnaB&0.0010\\
+kegg\_gidB\_rsmG&0.0008\\
+kegg\_zapA&0.0007\\
+kegg\_fis&0.0007\\
+kegg\_mukE&0.0006\\
+aclame\_RepA\_BCopB&0.0005\\
+kegg\_mukB&0.0005\\
+aclame\_RepB&0.0005\\
+kegg\_ihfA\_himA&0.0004\\
+\end{tabular}
+\end{scriptsize}
+\end{minipage}
+\hspace{1cm}
+\begin{minipage}[t]{0.3\textwidth}
+\vspace{0cm}
+\centering
+\begin{scriptsize}
+\begin{tabular}{c>{\bfseries}c}
+Fonction & Score$^{a}$\\
+\hline
+\\[-0.2cm]
+aclame\_PSK\_ccd&0.0004\\
+kegg\_mukF&0.0004\\
+kegg\_smc&0.0003\\
+aclame\_Fis&0.0003\\
+kegg\_ftsQ&0.0002\\
+aclame\_PSK\_HOK/SOK&0.0002\\
+kegg\_ftsB&0.0002\\
+kegg\_mreC&0.0002\\
+aclame\_Rop&0.0002\\
+kegg\_mreD&0.0001\\
+aclame\_DNAbinding&0.0001\\
+aclame\_PSK\_yacA&0.0001\\
+kegg\_hda&0.0001\\
+kegg\_gidA\_mnmG\_MTO1&0.0001\\
+kegg\_trmFO\_gid&0.0001\\
+aclame\_cdsD&0.0001\\
+aclame\_ParR\_ParB&0.0\\
+aclame\_Rep&0.0\\
+aclame\_helicase&0.0\\
+aclame\_RepR\_S\_E&0.0\\
+kegg\_divIVA&0.0\\
+kegg\_racA&0.0\\
+kegg\_dnaI&0.0\\
+kegg\_ezrA&0.0\\
+kegg\_hupA&0.0\\
+kegg\_stpA&0.0\\
+aclame\_PSK\_parC&0.0\\
+kegg\_ftsN&0.0\\
+aclame\_RepC\_J\_E&0.0\\
+kegg\_sepF&0.0\\
+kegg\_diaA&0.0\\
+aclame\_plasmidmaintenance\_PSK&0.0\\
+kegg\_dnaB2\_dnaB&0.0\\
+kegg\_seqA&0.0\\
+kegg\_ftsL&0.0\\
+kegg\_divIC\_divA&0.0\\
+aclame\_PSK\_vapXD&0.0\\
+kegg\_zipA&0.0\\
+aclame\_RNApolymerase&0.0\\
+\end{tabular}
+\end{scriptsize}
+\end{minipage}
+\caption*{$^{a}$ Score de l'importance des attributs selon les variations de l'$OOB_{score}$ (décrit dans \citep{Breiman2001}).}
+\end{table}
+
+$\bullet$ \textbf{Choisies en tant qu'attributs des réplicons, les annotations fonctionnelles des protéines des STIG permettent une meilleure discrimination des types que les clusters des protéines STIG seuls.} Les $OOB_{score}$  (Tables \ref{tabresclassif} et \ref{tabscoreoob}) montrent une plus grande efficacité ($p_{value}<<0.05$ pour les tests de Kolmogorov-Smirnov) des attributs fonctionnels dans les classifications RECE/plasmide et chromosome/RECE, mais pas de différence significative pour la classification plasmide/chromosome. 
+
+\begin{table}[H]
+\centering
+\caption[$OOB_{score}$ obtenus avec ERT et les clusters protéiques en tant qu'attributs]{$OOB_{score}$ obtenus avec la procédure de classification $f_{ERT}^{E_{training}}$ en utilisant les clusters protéiques comme attributs des réplicons. \\ $\{V^{R^{\{RECE\}}},V^{R^{\{plasmide\}}}\}^{it}$ et $\{V^{R^{\{RECE\}}},V^{R^{\{chr\}}}\}^{it}$ désignent des procédures itératives d'échantillonnage aléatoire similaires à celles décrites \S \ref{parprotocclassif}.} \label{tabscoreoob}
+
+\begin{tabular}{c|cc}
+$\mathbf{E_{training}}$& $OOB_{score}$ & $\sigma_{OOB_{score}}$\\
+\hline
+\\[-0.2cm]
+$\{V^{R^{\{RECE\}}},V^{R^{\{plasmide\}}}\}$&0,89 & -\\
+$\{V^{R^{\{RECE\}}},V^{R^{\{plasmide\}}}\}^{it}$&0,82 & 0,02\\
+$\{V^{R^{\{chr\}}},V^{R^{\{plasmide\}}}\}$&1,0& -\\
+$\{V^{R^{\{RECE\}}},V^{R^{\{chr\}}}\}^{it}$&0,95 & 0,02\\
+\end{tabular}
+\end{table}	  
+
+Ces résultats laissent présager que, par rapport aux STIG, \textbf{\color{orange} les RECE se différencient des chromosomes et des plasmides plus par les spécificités fonctionnelles de leurs STIG, que structurellement, selon les homologies des séquences protéiques des STIG, témoignant des origines plasmidiques et/ou chromosomiques des RECE.} \\	 
+	 
+
+$\bullet$  \textbf{Les classifieurs utilisés ainsi que les attributs sélectionnés ne permettent pas de discriminer significativement les génomes multipartites des génomes monopartites} (Tables \ref{tabresclassif} et \ref{tabGmean}), rejoignant ainsi les conclusions présentées \S \ref{reglogresult} où seulement de faibles biais sont detectés entre $K_{monopartite}$ et $K_{multipartite}$. 
+
+	  	  
+\begin{table}[H]
+\caption[Probabilités des génomes multipartites d'appartenir à la classe "multipartite"]{Moyenne, par genre bactérien, des probabilités des différents génomes multipartites d'appartenir à la classe "multipartite", obtenues par la procédure de classification: $f_{ERT}^{E_{training}}(V_{f}^{G^{\{multipartite\}}})$ avec $E_{training}=\{G_{multipartite},E_{monopartite}\}^{it}$ .}\label{tabGmean}
+\begin{minipage}[t]{0.5\textwidth}
+\small
+\vspace{0cm}
+\centering
+\begin{tabular}{>{\itshape}c>{\bfseries}c}
+Ochrobactrum&0.8690\\
+Sinorhizobium&0.8610\\
+Paracoccus&0.8550\\
+Photobacterium&0.8230\\
+Variovorax&0.8110\\
+Cyanothece&0.8010\\
+Anabaena&0.7970\\
+Aliivibrio&0.7960\\
+Agrobacterium&0.7818\\
+Asticcacaulis&0.7730\\
+Ralstonia&0.7540\\
+Butyrivibrio&0.7540\\
+Cupriavidus&0.74650\\
+Sphaerobacter&0.7440\\
+\end{tabular}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\small
+\vspace{0cm}
+\centering
+\begin{tabular}{>{\itshape}c>{\bfseries}c}
+Sphingobium&0.7355\\
+Thermobaculum&0.722\\
+Candidatus&0.7130\\
+Deinococcus&0.7040\\
+Ilyobacter&0.6880\\
+Nocardiopsis&0.6650\\
+Vibrio&0.6466\\
+Brucella&0.6425\\
+Rhodobacter&0.6317\\
+Burkholderia&0.6271\\
+Pseudoalteromonas&0.5925\\
+Prevotella&0.5310\\
+Leptospira&0.4844\\
+\end{tabular}
+\end{minipage}
+\end{table}
+
+Une majorité de génomes multipartites présente une faible probabilité ($P<0.70$) d'être classée en tant que ``multipartite" (Table \ref{tabGmean}). Cette constatation est encore plus frappante lors de l'utilisation de  $\{E_{monopartite},E_{multipartite}\}$ comme training set (et non de la procédure itérative (résultats non montrés)), où seulement un quart des génomes multipartites sont classés comme ``multipartite". Cependant, à une exception près: \textit{Leptospira}, l'ensemble des génomes multipartites est correctement classé ($P>0.5$, Table \ref{tabGmean}),  avec des probabilités élevées pour certains genres. Si ces observations ne découlent pas d'artefacts, \textit{e.g.}, nombre réduit et faible diversité des génomes multipartites, attributs manquants, corrélations non prises en compte..., (\textit{cf.} \S  \ref{reglogconcl}), alors \textbf{\color{orange}il existe des caractéristiques identifiables chez les STIG des génomes multipartites}. Les attributs fonctionnels pertinents dans la classification sont similaires (résultats non montrés) à ceux précédemment identifiés  (Table \ref{tabreglogis}) et englobent principalement les protéines de partition, de résolution de dimères (XerC, XerD) et certains régulateurs (Lrp, IciA...).
+	  
+
+	  
+\section{Les nouveaux RECE}\label{neorece}
+	Parmi les réplicons nouvellement identifiés comme RECE (Tables \ref{tabclassifrece1} et \ref{tabclassifrece2}), il existe dans la littérature des indices les rapprochant des RECE:
+\begin{description} 	  
+	\item[$\bullet$] Parmi les réplicons extra-chromosomiques d'\textit{Azospirillum}, il a été suggéré qu'un des plasmides de \textit{A. brasilense} est en fait essentiel \citep{Acosta-Cruz2012}. Ce RECE est identifié par l'analyse ainsi que certains plasmides additionnels de \textit{A. brasilense}, \textit{A. lipoferum} et \textit{A.} sp. B510. On peut faire ainsi les hypothèses que ces réplicons identifiés sont i) les homologues du RECE déjà identifié chez \textit{A. brasilense} ou ii) des RECE ``en devenir" (\textit{cf.} \S \ref{parazos}).
+	\item[$\bullet$] Il a été proposé récemment que différents réplicons extra-chromosomiques de \textit{Rhizobium} (p42e, pA, pRL11, pRLG202 et pR132502) soient désignés par le terme de ``chromosome secondaire" \citep{Landeta2011,Villasenor2011}. La nature essentielle de ces réplicons (NC\_007765, NC\_010998, NC\_008384, NC\_011366, NC\_012858, respectivement) est confirmée par notre l'analyse. 
+	\item[$\bullet$] pSymA (\textit{Sinorhizobium} spp.), comporte de nombreux gènes importants pour la \textit{fitness} de l'organisme \citep{blanca2010psyma} et, bien que considéré comme non-essentiel, contribue grandement à la \textit{fitness} de l'hôte \citep{galardini2013replicon}. Dans le jeux de données initial, seul le génome de \textit{Sinorhizobium meliloti} AK83 est annnoté comme étant multipartite. Notre analyse permet d'identifier les réplicons extra-chromosomiques similaires aux deux RECE pSymA et pSymB chez les autres souches de \textit{S. meliloti} ainsi que chez \textit{S. fredii} et \textit{S. medicae}.
+	\item[$\bullet$] Les trois mégaplasmides, pTM1, pTM2 et pTM3 ($>600 kb$), sur les quatre réplicons extra-chromosomiques que le génome de \textit{Tistrella mobilis} comporte sont identifiés comme des RECE par notre analyse. pTM2 et pTM3 possèdent des opérons ARNt et ARNr, soulignant leur importance dans le génome.
+	\item[$\bullet$] Chez \textit{Butyrivibrio proteoclasticus}, le plasmide pCY186 (NC\_014390) est identifié (avec une faible probabilité: $P=0.56$) comme un potentiel RECE. Ce réplicon comporte de nombreuses protéines impliquées dans la réplication chromosomique \citep{Yeoman2011}. L'autre plasmide, pCY360 (NC\_014389), également reconnu comme essentiel par \cite{Yeoman2011}, n'est pas détecté comme un RECE dans notre analyse (mais est légèrement biaisé: $P=0.32$).
+	\item[$\bullet$] Les différents plasmides identifiés chez les \textit{Burkholderiales} témoignent de la capacité des réplicons extra-chromosomiques de cette famille à s'échanger du matériel génétique \citep{maida2014origin} et à former des RECE à partir des plasmides \citep{Passot2012}. Les réplicons de \textit{Ralstonia solanacearum} (annoté monopartite dans RefSeq) identifiés comme RECE sont ainsi vraisemblablement les homologues des RECE des espèces multipartites de \textit{Ralstonia} .
+	\item[$\bullet$] Chez les Actinobactéries, certains génomes possèdent des mégaplasmides singuliers par leur linéarité et leur taille ($\approx 1.5$ Mb). Le mégaplasmide linéaire de \textit{Streptomyces cattleya} ($1.8$ Mb), identifié comme RECE avec des scores important ($P>0.7$), ainsi que celui de \textit{S. coelicolor}, possèdent des gènes impliqués dans les voies de synthèse de divers antibiotiques et métabolites secondaires \citep{o2009extracellular,barbe2011complete}. Le mégaplasmide linéaire de \textit{S. clavuligerus}, également RECE potentiel, est un vaste réservoir de gènes de voies métaboliques en contenant plus de 20\% des gènes du génome et possèdant de nombreuses régulations croisées avec le chromosome \citep{medema2010sequence}. Le chromosome de \textit{S. clavuligerus} dépend de plus du gène \textit{tap}, impliqué dans la réplication du télomère, codé par le plasmide. Même si aucun gène codé par le mégaplasmide semble appartenir au génome-coeur \citep{medema2010sequence}, il est envisageable que le mégaplasmide contribue très fortement à la \textit{fitness} de l'organisme. 
+	\item[$\bullet$] Plusieurs plasmides de \textit{Acaryochloris marina} (2 ou 3 selon l'analyse: pREB1, pREB2 et pREB3, Table \ref{tabclassifplasmid}) ont été identifiés comme des RECE potentiels. Ces mégaplasmides (de taille comprise entre 273 et 354 kb) codent tous pour des protéines clé du métabolisme \citep{swingley2008niche}, ce qui laisse envisager qu'ils contribuent à la \textit{fitness} de l'organisme.
+	\item[$\bullet$] pAQ7, le plus grand (186 kb) plasmide de \textit{Synechococcus sp. PCC 7002}, identifié comme RECE par notre analyse, est présent dans le génome en même nombre de copies que le chromosome \citep{xu2010synechococcus}.
+	 \item[$\bullet$] pRAHAQ01, le mégaplasmide de \textit{Rahnella}  sp. Y9602, RECE potentiel, a un pourcentage en G+C (52.1\%) très proche de celui du chromosome (52.4\%) \citep{martinez2012complete}. Une constatation similaire est faite pour le plasmide de \textit{R. aquatilis} HX2 aussi identifié comme un RECE.
+\item[$\bullet$] Le mégaplasmide (821kb) de \textit{Ruegeria} comporte des opérons ARNr ainsi que des gènes uniques \citep{moran2007ecological}. Il est notable de constater qu'à l'exception de ce mégaplasmide chez \textit{Ruegeria}, aucun plasmide des proches \textit{Roseobacter} n'a été identifié par l'analyse.
+	 \item[$\bullet$] Le mégaplasmide (1.2Mb) de \textit{Methylobacterium extorquens} AM1, identifié comme RECE \textbf{et} comme chromosome (Table \ref{tabclassifrec}), possède une région synténique de 130kb avec le chromosome, une ploïdie de 1, ainsi que des opérons ARNt \citep{vuilleumier2009methylobacterium}.  
+\end{description}
+	Ces différents éléments montrent la pertinence des analyses de classification et leur capacité à identifier des réplicons présentant une composition biaisée en gènes des STIG et potentiellement intégrés dans le cycle cellulaire. Cependant, il est évident que tous les réplicons identifiés ne sont pas forcément catégoriquement essentiels pour leur hôte, et que tous les réplicons de type RECE non annotés jusqu'à présent n'ont pas été identifiés (le plasmide pCY360 de \textit{Butyrivibrio} en témoigne). \\
+	Cette analyse fait ressortir les réplicons présentant un biais significatif en gènes des STIG, ce qui laisse supposer \textbf{\color{orange} une prédisposition des réplicons identifiés à exister dans le génome dans un état de stabilité supérieur à celui des ``vrais" plasmides}. Parmi les RECE identifiés, certains d'entre eux présentent une ploïdie similaire à celle du chromosome du génome et différente de celles des plasmides (\textit{c.f.} \textit{Synechococcus, Methylobacterium}...), pouvant suggérer une coordination du RECE et du chromosome. De plus, les différents éléments de la littérature concernant les réplicons identifiés vont dans le sens que ces réplicons, par leur composition particulière en gènes des STIG, présentent un certain degré de stabilisation dans le génome leur offrant un potentiel de futur RECE, même si aucun des gènes de ces réplicons ne semble être strictement essentiel pour l'hôte.
+	

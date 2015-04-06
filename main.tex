@@ -1,0 +1,347 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Masters/Doctoral Thesis 
+% LaTeX Template
+% Version 1.42 (19/1/14)
+%
+% This template has been downloaded from:
+% http://www.latextemplates.com
+%
+% Original authors:
+% Steven Gunn 
+% http://users.ecs.soton.ac.uk/srg/softwaretools/document/templates/
+% and
+% Sunil Patel
+% http://www.sunilpatel.co.uk/thesis-template/
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+% Note:
+% Make sure to edit document variables in the Thesis.cls file
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt, a4paper, oneside]{Thesis} % Paper size, default font size and one-sided paper
+
+\graphicspath{{Pictures/}} % Specifies the directory where pictures are stored
+\usepackage[frenchb]{babel}
+%%%%%%%% package ajoutée %%%%%%%%%%%%%%%%
+\usepackage[frenchb]{babel}
+\usepackage{afterpage}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{rotating}
+\usepackage{wrapfig}
+\usepackage{multicol}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{pgf-pie}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{qtree}
+%\usepackage{lmodern}
+\usepackage{amsmath,amsfonts}
+\usepackage{mathtools}
+\usepackage{pdflscape}
+\usepackage{xcolor,colortbl}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{changepage}
+\usepackage{etex}
+\usepackage{supertabular}
+\usepackage{pgfplots}
+%\usepackage[Thesis]{geometry}
+% \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{natbib}
+\usepackage[square,semicolon,sort]{natbib} % Use the natbib reference package - read up on this to edit the reference style; if you want text (e.g. Smith et al., 2012) for the in-text references (instead of numbers), remove 'numbers' 
+\hypersetup{urlcolor=blue, colorlinks=true} % Colors hyperlinks in blue - change to black if annoying
+%\renewcommand{\cite}{\citep}
+\renewcommand{\ttitle}{Discrimination analytique des génomes bactériens}
+\renewcommand{\univname}{École Centrale de Lyon}
+\renewcommand{\degreename}{Docteur en ingénierie du vivant}
+
+\newenvironment{changemargin}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}%
+}%
+\item[]}{\end{list}}
+
+%----------------------------------------------------------------------------------------
+%	BLANK DOCUMENT
+%----------------------------------------------------------------------------------------
+\title{\ttitle} % Defines the thesis title - don't touch this
+\begin{document}
+
+\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
+
+\setstretch{1.3} % Line spacing of 1.3
+% Define the page headers using the FancyHdr package and set up for one-sided printing
+\fancyhead{} % Clears all page headers and footers
+\rhead{\thepage} % Sets the right side header to show the page number
+\lhead{} % Clears the left side page header
+
+\pagestyle{fancy} % Finally, use the "fancy" page style to implement the FancyHdr headers
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % New command to make the lines in the title page
+
+% PDF meta-data
+\hypersetup{pdftitle={\ttitle}}
+\hypersetup{pdfsubject=\subjectname}
+\hypersetup{pdfauthor=\authornames}
+\hypersetup{pdfkeywords=\keywordnames}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage}
+%\titleGP
+
+\begin{center}
+\textsc{\LARGE Université de Lyon}\\[0.2cm]
+\textsc{\LARGE \univname}\\[1.5cm] % University name
+\textsc{\Large Thèse de doctorat}\\[0.5cm] % Thesis type
+
+\HRule\\[-0.4cm]\HRule\\[0.4cm] % Horizontal line
+{\huge \bfseries \ttitle}\\[0.4cm] % Thesis title
+\HRule\\[-0.4cm]\HRule\\[1.5cm] % Horizontal line
+\begin{center}
+\begin{minipage}{0.5\textwidth}
+\large
+\emph{\textbf{\Large Olivier POIRION}}\\\\
+% \href{http://www.team.com}{\authornames} % Author name - remove the \href bracket to remove the link
+\textnormal{Direction:}\\
+\emph{\textnormal{Bénédicte Lafay}} \\
+\emph{\textnormal{Laurent Krähenbhüll}}\\
+% \href{http://www.jamessmith.com}{\supname} % Supervisor name - remove the \href bracket to remove the link  
+\end{minipage}\\[3cm]
+\end{center}
+\deptname
+%\large \textit{Thèse présentée dans le respect des exigences\\ pour le diplôme de \degreename}\\[1cm] % University requirement text
+%\textit{dans le}\\[0.4cm]
+\href{http://edeea.ec-lyon.fr/}{École Doctorale EEA}\\[2cm] % Research group name and department name
+ 
+{\large \today}\\[4cm] % Date
+%\includegraphics{Logo} % University/department logo - uncomment to place it
+\end{center}
+
+\end{titlepage}
+\clearpage
+\clearpage
+
+%----------------------------------------------------------------------------------------
+%	DECLARATION PAGE
+%	Your institution may give you a different text to place here
+%----------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------
+%	ABSTRACT PAGE
+%----------------------------------------------------------------------------------------
+
+\addtotoc{Résumé} % Add the "Abstract" page entry to the Contents
+
+\abstract{Résumé}{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
+
+\setstretch{1.1}
+
+Le génome bactérien est classiquement pensé comme constitué de ``chromosomes", éléments génomiques essentiels pour l'organisme, stables et à évolution lente, et de  ``plasmides", éléments génomiques accessoires, mobile et à évolution rapide. La distinction entre plasmides et chromosomes a récemment été mise en défaut par la découverte dans certaines lignées bactériennes d'éléments génomiques intermédiaires, possédant à la fois des caractéristiques de chromosomes et de plasmides. Désignés par le terme de ``chromosomes secondaires", ``mégaplasmides" ou ``chromids", Ces éléments  sont dispersés dans l'ensemble des génomes bactériens et sont couramment décrits comme des plasmides adaptés et modifiés. Cependant, leur véritable nature et les mécanismes permettant leurs intégration dans le génome stable reste à caractériser.\\
+En utilisant les protéines liées aux \textbf{S}ystèmes de \textbf{T}ransmission de l'\textbf{I}nformation \textbf{G}énétique comme variables descriptives des éléments génomiques bactériens (ou réplicons), une étude globale de génomique comparative a été conduite sur l'ensemble des génomes bactériens disponibles. À travers l'analyse de l'information contenue dans ce jeu de données par différentes approches analytiques, il apparaît que les STIG sont des marqueurs pertinents de l'état d'intégration des réplicons dans le génome stable, ainsi que de leur origine évolutive. Les \textbf{R}éplicons \textbf{E}xtra-\textbf{C}hromosomiques \textbf{E}ssentiels sont de plus caractérisés comme marqueurs témoignant de la diversité et de l'évolution des mécanismes génétiques permettant l'intégration de réplicons dans le génome stable, attestant ainsi de la continuité du matériel génomique.
+
+}
+\newpage
+\addtotoc{Summary} % Add the "Abstract" page entry to the Contents
+
+\abstract{Summary}{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
+
+\setstretch{1.1}
+
+The genome of bacteria is classically separated into essential, stable and slow evolving replicons (chromosomes) and accessory, mobile and rapidly evolving replicons (plasmids). This paradigm is being questioned since the discovery of extra-chromosomal essential replicons (ECERs), be they called megaplasmids, secondary chromosomes or chromids, which possess both chromosomal and plasmidic features. These ECERs are found in diverse lineages across the bacterial phylogeny and are generally believed to be modified plasmids. However, their true nature and the mechanisms permitting their integration within the sable genome are yet to be formally determined.
+The relationships between replicons, with reference to their genetic information inheritance systems (GIIS), were explored under the assumption that the inheritance of ECERs is integrated to the cell cycle and highly constrained in contrast to that of standard plasmids. A global comparative genomics analysis including all available of complete bacterial genome sequences, was performed using GIIS functional homologues as parameters and applying several analytical procedures. GIIS proved appropriate in characterizing the level of integration within the stable genome, as well as the origins, of the replicons. The study of ECERs thus provides clues to the genetic mechanisms and evolutionary processes involved in the replicon stabilization into the essential genome and the continuity of the genomic material.
+
+}
+%\clearpage % Start a new page
+\newpage
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
+\setstretch{1.3} % Reset the line-spacing to 1.3 for body text (if it has changed)
+\acknowledgements{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
+Je tiens à remercier mes encadrants de thèse: Bénédicte Lafay et Laurent Krähenbhüll, les membres de mon jury, ma famille et, enfin, mes amis.
+}
+\clearpage % Start a new page
+
+%----------------------------------------------------------------------------------------
+%	LIST OF CONTENTS/FIGURES/TABLES PAGES
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy} % The page style headers have been "empty" all this time, now use the "fancy" headers as defined before to bring them back
+
+\lhead{\emph{Contenu}} % Set the left side page header to "Contents"
+\tableofcontents % Write out the Table of Contents
+\clearpage
+\lhead{\emph{Liste des Figures}} % Set the left side page header to "List of Figures"
+\listoffigures % Write out the List of Figures
+\newpage
+\lhead{\emph{Liste des Tableaux}} % Set the left side page header to "List of Tables"
+\listoftables % Write out the List of Tables
+
+%----------------------------------------------------------------------------------------
+%	ABBREVIATIONS
+%----------------------------------------------------------------------------------------
+
+\clearpage % Start a new page
+
+\setstretch{1.5} % Set the line spacing to 1.5, this makes the following tables easier to read
+
+\lhead{\emph{Abréviations}} % Set the left side page header to "Abbreviations"
+\listofsymbols{@{\hspace{-2cm}}>{\bfseries}ll} % Include a list of Abbreviations (a table of two columns)
+{
+\textbf{ARNr} & \textbf{ARN} \textbf{r}ibosomique\\
+\textbf{ARNt} & \textbf{ARN} de \textbf{t}ransfert\\
+\textbf{chr} & \textbf{chr}omosome\\
+\textbf{ICE} & \textbf{I}ntegrative \textbf{C}onjugative \textbf{E}lement, (\S  \ref{transposon})\\
+\textbf{IME} & \textbf{I}ntegrative \textbf{M}obile \textbf{E}lement, (\S  \ref{transposon})\\
+\textbf{IPP} & \textbf{I}nteraction \textbf{P}rotéines-\textbf{P}rotéines\\
+\textbf{ITR} & (plasmide) \textbf{I}ntragenomic \textbf{T}anslocation \textbf{R}ecipient (\S \ref{parbruc})\\
+\textbf{NAP} & \textbf{N}ucleoid \textbf{A}ssociated \textbf{P}rotein\\
+\textbf{MGE} & \textbf{M}obile \textbf{G}enetic \textbf{E}lement, (\S  \ref{transposon})\\
+\textit{\textbf{ori}} & Origine de réplication (\S \ref{architecture})\\
+\textit{\textbf{oriT}} & Origine de transfert (\S  \ref{conj})\\
+\textbf{pb}& Paire de bases \\
+\textbf{OR} & \textbf{O}dd \textbf{R}atio, rapport de chance, défini selon un modèle de régression logistique (\S \ref{parregresslog})\\
+\textbf{PSK} & \textbf{P}ost-\textbf{S}egregational \textbf{K}illing (\S  \ref{regul}) \\
+\textbf{RC} & \textbf{R}olling \textbf{C}ircle (replication)\\
+\textbf{RECE} & \textbf{R}éplicon \textbf{E}xtra-\textbf{C}hromosomique \textbf{E}ssentiel\\
+\textbf{SD} & \textbf{S}trand \textbf{D}isplacement (replication)\\
+\textbf{STIG} & \textbf{S}ystèmes de \textbf{T}ransmission de l'\textbf{I}nformation \textbf{G}énétique\\
+\textbf{THG}&\textbf{T}ransfert \textbf{H}orizontal de \textbf{G}ène, (\S \ref{parevoldesrepl})\\
+%\textbf{Acronym} & \textbf{W}hat (it) \textbf{S}tands \textbf{F}or \\
+}
+
+%----------------------------------------------------------------------------------------
+%	PHYSICAL CONSTANTS/OTHER DEFINITIONS
+%----------------------------------------------------------------------------------------
+
+\clearpage % Start a new page
+\newpage
+\setstretch{1.1}
+\lhead{\emph{Lexique}} % Set the left side page header to "Physical Constants"
+
+\listofnomenclature{@{\hspace{-2cm}}>{\bfseries}lp{0.8\textwidth}} % Include a list of Abbreviations (a table of two columns)
+{
+Observation & Désigne un élément extrait d'un jeu de données\\[0.2cm]
+Attribut & Caractéristique décrivant une observation\\[0.2cm]
+Clustering & Désigne un processus de partition d'un ensemble d'observations\\[0.2cm]
+Génome-coeur & Fraction du génome partagée par tous les membres d'une espèce (\S \ref{coregenome})\\[0.2cm]
+Fitness & Désigne ce qui a rapport avec les capacités de survie et de développement d'un organisme biologique à court, moyen et long terme, dans ses habitats naturels (\S \ref{chrIIess})\\[0.2cm]
+Data mining & Fouille de données. Ensembles de méthodes analytiques (\S \ref{analyseintro})\\[0.2cm]
+Input & Donnée(s) d'entrée d'un processus analytique ou algorithmique\\[0.2cm]
+Outlier & Donnée d'un jeu de données, distantes de la majorité des données\\[0.2cm]
+Output & Donnée(s) de sortie d'un processus analytique ou algorithmique\\[0.2cm]
+Overfitting & Sur-apprentissage (\S \ref{analyseintro}).\\[0.2cm]
+Machine learning & Ensemble de méthodes analytiques fondées sur l'apprentissage (\S \ref{analyseintro})\\[0.2cm]
+Training set &  Jeu de données d'apprentissage avec lequel un algorithme peut être entraîné avant d'être testé sur un jeu de données (\S \ref{analyseintro})\\[0.2cm]
+% Constant Name & Symbol & = & Constant Value (with units) \\
+}
+%----------------------------------------------------------------------------------------
+%	SYMBOLS
+%----------------------------------------------------------------------------------------
+
+\clearpage % Start a new page
+\newpage
+
+\setstretch{1.1}
+\lhead{\emph{Symboles}} % Set the left side page header to "Physical Constants"
+
+\listofconstants{@{\hspace{-2cm}}>{\bfseries}lp{0.8\textwidth}} % Include a list of Abbreviations (a table of two columns)
+{ 
+$R$ & Désigne l'ensemble des réplicons considérés dans l'étude\\[0.2cm]
+$G$ & Désigne  l'ensemble des génomes considérés dans l'étude\\[0.2cm]
+$Kl$ & Désigne un clustering d'un ensemble de réplicons ou de génomes\\[0.2cm]
+$Cl$ & Désigne un clustering d'un ensemble de protéines\\[0.2cm]
+$V^{R}$ & Désigne un ensemble de vecteurs où chaque vecteur correspond à un réplicon de $R$ ayant comme attributs les protéines codées par celui-ci et appartenant à des clusters d'homologues (\S \ref{parjeuxdedonnees})\\[0.2cm]
+$\bar{V}_{genre}^{R}$ & Désigne un ensemble de vecteurs où chaque vecteur correspond à un ensemble de réplicons de $R$ du même type et du même genre taxonomique et où ce vecteur correspond au barycentre des vecteurs de réplicons de ce groupe (\S \ref{parjeuxdedonnees})\\[0.2cm]
+$V^{R}_{f}$ & Similaire à $V^{R}$ mais les attributs des vecteurs sont les annotations des clusters d'homologues (\S \ref{pardonnee2})\\[0.2cm]
+$V^{G}_{f}$ & Similaire à $V^{R}_{f}$ mais  les observations considérées sont les génomes (\S \ref{parjeuxdedonnees})\\[0.2cm]
+$\bar{V}_{f,genre}^{R}$ & Similaire à $\bar{V}_{genre}^{R}$ mais les attributs considérés sont les annotations des clusters d'homologues (\S \ref{pardonnee2})\\[0.2cm]
+$\bar{V}_{f,genre}^{G}$ & Similaire à $\bar{V}_{f,genre}^{R}$  mais les observations considérées sont les génomes (\S \ref{pardonnee2})\\[0.2cm]
+$Cl^{KEGG}$ & Ensemble des familles d'orthologues protéiques de KEGG sélectionnées (\S \ref{donneerequete})\\[0.2cm]
+$Cl^{ACLAME}$ & Ensemble des familles de protéines ACLAME sélectionnées (\S \ref{donneerequete})\\[0.2cm]
+$P^{ref}$ & Ensemble des protéines de référence d'ACLAME et de KEGG\\[0.2cm]
+$gr$& Granularité de l'algorithme TRIBE-MCL\\[0.2cm]
+}
+\clearpage % Start a new page
+%----------------------------------------------------------------------------------------
+%	DEDICATION
+%----------------------------------------------------------------------------------------
+
+\setstretch{1.1} % Return the line spacing back to 1.3
+
+\pagestyle{empty} % Page style needs to be empty for this page
+
+\dedicatory{} % Dedication text
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - CHAPTERS
+%----------------------------------------------------------------------------------------
+
+\mainmatter % Begin numeric (1,2,3...) page numbering
+\pagestyle{fancy} % Return the page headers back to the "fancy" style
+
+\input{Chapters/intro}
+\input{Chapters/Chapter1-bl}
+\input{Chapters/Chapter2-bl}
+\input{Chapters/Chapter3-bl}
+\input{Chapters/Chapter4-bl}
+\input{Chapters/Chapter5-bl}
+\input{Chapters/Chapter6-bl}  
+\input{Chapters/Chapter7-bl}
+\input{Chapters/Chapter8-bl}
+\input{Chapters/Chapter9-bl}
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\label{Bibliography}
+
+\lhead{\emph{Bibliography}} % Change the page header to say "Bibliography"
+
+\bibliographystyle{chicago} % Use the "unsrtnat" BibTeX style for formatting the Bibliography
+
+ \bibliography{publicollection23012014} % The references (bibliography) information are stored in the file named "Bibliography.bib"
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - APPENDICES
+%----------------------------------------------------------------------------------------
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+\appendix % Cue to tell LaTeX that the following 'chapters' are Appendices
+
+% Include the appendices of the thesis as separate files from the Appendices folder
+% Uncomment the lines as you write the Appendices
+
+\input{Appendices/AppendixA}
+\input{Appendices/AppendixB}
+\input{Appendices/AppendixC}
+\input{Appendices/AppendixD}
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+\backmatter
+
+\end{document}  
