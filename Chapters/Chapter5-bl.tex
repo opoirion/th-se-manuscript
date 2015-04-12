@@ -176,7 +176,7 @@ L'approche utilisée, inspirée de Hennig \citep{hennig2007cluster}, consiste, p
 Soit un ensemble $E=\{e_{1},...,e_{|E|}\}$ d'observations, une procédure de clustering $f_{clustering}$, et un clustering $Kl$ de E tel que $f_{clustering}(E)=Kl$. On applique la procédure suivante:
 	\\\\
 	%\begin{subequation}
-\begin{longtable}{p{0.1\textwidth}p{0.9\textwidth}}
+\begin{longtable}{@{\hspace{-0.2cm}}p{0.1\textwidth}@{\hspace{-0.1cm}}p{0.9\textwidth}}
 	(1) & \textrm{Un Bootstrap sur $E$ de $n$ échantillons, $Ech_{E}=\{E_{1},...,E_{n}\}$, est réalisé à partir de tirages aléatoires avec remise sur $E$}\\
 	(2) & Pour chaque échantillon $E_{i}$ de $Ech_{E}$, on calcule $f_{Cl}(E_{i})$. \textrm{On note $Ech_{Kl}=\{f_{Cl}(E_{i})|\;  E_{i} \in Ech_{E}\}$}\\
 	(3) & Soient un cluster $C$ tel que $C \in Kl$, un clustering $Kl_{i}$ tel que $Kl_{i} \in Ech_{Kl}$, et un ensemble d'observations $E_{i}$ tel que $E_{i} \in Ech_{E}$. On définit $\bigtriangleup_{i}^{C}$, comme la valeur:
@@ -242,7 +242,7 @@ L'exploration des données a donc reposé sur deux approches méthodologiques de
 \subsubsection{Méthodes utilisées}
 	   Quatre types de projection ont été étudiés pour réaliser la projection des ensembles $V^{R}$ et $\bar{V}^{R}_{genre}$ dans des espaces à deux dimensions (\ref{tabprojec}).
    	   
-      \begin{longtable}{ @{\hspace{-2.2cm}} >{\bfseries}p{0.05\textwidth}|>{\small}p{1.1\textwidth} }
+      \begin{longtable}{ @{\hspace{-2.2cm}} >{\bfseries}p{0.05\textwidth}|>{\small}p{1.0\textwidth} }
       \caption[Méthodes de projection utilisées]{Méthodes de projection utilisées dans l'analyse des données.}\\ \label{tabprojec}
       \textbf{ACP} & L'\textbf{A}nalyse en \textbf{C}omposantes \textbf{P}rincipales \citep{hotelling1933analysis} est une méthode statistique permettant d'exprimer les valeurs de $p$ variables corrélées tirées de $n$ observations en $q$ variables non-corrélées, de manière à ce que les $q$ variables soient des combinaisons linéaires des $p$ variables et qu'elles soient orthogonales entre elles selon une distance $d$. Les $q$ variables, ou \textit{composantes}, définissent un espace en $q$ dimensions ($q < p$) dans lequel sont projetées les observations. Les $q$ variables sont choisies pour que la variance entre observations soit maximisée (et donc que l'\textit{inertie} des observations par rapport aux $q$ composantes soit minimale \citep{duby2006analyse}). Le seul paramètre à choisir est  $q$, le nombre de dimensions, $d$ étant la distance Euclidienne.
 \\[0.4cm]

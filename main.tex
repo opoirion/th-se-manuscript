@@ -56,6 +56,7 @@
 \usepackage{etex}
 \usepackage{supertabular}
 \usepackage{pgfplots}
+\tolerance=800
 %\usepackage[Thesis]{geometry}
 % \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,7 +125,7 @@
 % \href{http://www.team.com}{\authornames} % Author name - remove the \href bracket to remove the link
 \textnormal{Direction:}\\
 \emph{\textnormal{Bénédicte Lafay}} \\
-\emph{\textnormal{Laurent Krähenbhüll}}\\
+\emph{\textnormal{Laurent Krähenbühl}}\\
 % \href{http://www.jamessmith.com}{\supname} % Supervisor name - remove the \href bracket to remove the link  
 \end{minipage}\\[3cm]
 \end{center}
@@ -177,7 +178,7 @@ The relationships between replicons, with reference to their genetic information
 %----------------------------------------------------------------------------------------
 \setstretch{1.3} % Reset the line-spacing to 1.3 for body text (if it has changed)
 \acknowledgements{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
-Je tiens à remercier mes encadrants de thèse: Bénédicte Lafay et Laurent Krähenbhüll, les membres de mon jury, ma famille et, enfin, mes amis.
+Je tiens à remercier mes encadrants de thèse: Bénédicte Lafay et Laurent Krähenbühl, les membres de mon jury, ma famille et, enfin, mes amis.
 }
 \clearpage % Start a new page
 
@@ -302,6 +303,7 @@ $gr$& Granularité de l'algorithme TRIBE-MCL\\[0.2cm]
 \pagestyle{fancy} % Return the page headers back to the "fancy" style
 
 \input{Chapters/intro}
+
 \input{Chapters/Chapter1-bl}
 \input{Chapters/Chapter2-bl}
 \input{Chapters/Chapter3-bl}
@@ -311,7 +313,6 @@ $gr$& Granularité de l'algorithme TRIBE-MCL\\[0.2cm]
 \input{Chapters/Chapter7-bl}
 \input{Chapters/Chapter8-bl}
 \input{Chapters/Chapter9-bl}
-
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
@@ -334,12 +335,10 @@ $gr$& Granularité de l'algorithme TRIBE-MCL\\[0.2cm]
 
 % Include the appendices of the thesis as separate files from the Appendices folder
 % Uncomment the lines as you write the Appendices
-
 \input{Appendices/AppendixA}
 \input{Appendices/AppendixB}
 \input{Appendices/AppendixC}
 \input{Appendices/AppendixD}
-
 \addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
 
 \backmatter
