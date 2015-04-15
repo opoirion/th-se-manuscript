@@ -9,7 +9,7 @@
 % Original authors:
 % Steven Gunn 
 % http://users.ecs.soton.ac.uk/srg/softwaretools/document/templates/
-% and
+% andd
 % Sunil Patel
 % http://www.sunilpatel.co.uk/thesis-template/
 %
@@ -25,7 +25,7 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[11pt, a4paper, oneside]{Thesis} % Paper size, default font size and one-sided paper
+\documentclass[11pt, a4paper, twoside]{Thesis} % Paper size, default font size and one-sided paper
 
 \graphicspath{{Pictures/}} % Specifies the directory where pictures are stored
 \usepackage[frenchb]{babel}
@@ -44,6 +44,7 @@
 \usepackage{xcolor}
 \usepackage{multirow}
 \usepackage{qtree}
+\usepackage{changepage}
 %\usepackage{lmodern}
 \usepackage{amsmath,amsfonts}
 \usepackage{mathtools}
@@ -156,8 +157,7 @@
 
 \setstretch{1.1}
 
-Le génome bactérien est classiquement pensé comme constitué de ``chromosomes", éléments génomiques essentiels pour l'organisme, stables et à évolution lente, et de  ``plasmides", éléments génomiques accessoires, mobile et à évolution rapide. La distinction entre plasmides et chromosomes a récemment été mise en défaut par la découverte dans certaines lignées bactériennes d'éléments génomiques intermédiaires, possédant à la fois des caractéristiques de chromosomes et de plasmides. Désignés par le terme de ``chromosomes secondaires", ``mégaplasmides" ou ``chromids", Ces éléments  sont dispersés dans l'ensemble des génomes bactériens et sont couramment décrits comme des plasmides adaptés et modifiés. Cependant, leur véritable nature et les mécanismes permettant leurs intégration dans le génome stable reste à caractériser.\\
-En utilisant les protéines liées aux \textbf{S}ystèmes de \textbf{T}ransmission de l'\textbf{I}nformation \textbf{G}énétique comme variables descriptives des éléments génomiques bactériens (ou réplicons), une étude globale de génomique comparative a été conduite sur l'ensemble des génomes bactériens disponibles. À travers l'analyse de l'information contenue dans ce jeu de données par différentes approches analytiques, il apparaît que les STIG sont des marqueurs pertinents de l'état d'intégration des réplicons dans le génome stable, ainsi que de leur origine évolutive. Les \textbf{R}éplicons \textbf{E}xtra-\textbf{C}hromosomiques \textbf{E}ssentiels sont de plus caractérisés comme marqueurs témoignant de la diversité et de l'évolution des mécanismes génétiques permettant l'intégration de réplicons dans le génome stable, attestant ainsi de la continuité du matériel génomique.
+Le génome bactérien est classiquement pensé comme constitué de ``chromosomes", éléments génomiques essentiels pour l'organisme, stables et à évolution lente, et de  ``plasmides", éléments génomiques accessoires, mobile et à évolution rapide. La distinction entre plasmides et chromosomes a récemment été mise en défaut par la découverte dans certaines lignées bactériennes d'éléments génomiques intermédiaires, possédant à la fois des caractéristiques de chromosomes et de plasmides. Désignés par le terme de ``chromosomes secondaires", ``mégaplasmides" ou ``chromids", Ces éléments  sont dispersés dans l'ensemble des génomes bactériens et sont couramment décrits comme des plasmides adaptés et modifiés. Cependant, leur véritable nature et les mécanismes permettant leurs intégration dans le génome stable reste à caractériser. En utilisant les protéines liées aux \textbf{S}ystèmes de \textbf{T}ransmission de l'\textbf{I}nformation \textbf{G}énétique comme variables descriptives des éléments génomiques bactériens (ou réplicons), une étude globale de génomique comparative a été conduite sur l'ensemble des génomes bactériens disponibles. À travers l'analyse de l'information contenue dans ce jeu de données par différentes approches analytiques, il apparaît que les STIG sont des marqueurs pertinents de l'état d'intégration des réplicons dans le génome stable, ainsi que de leur origine évolutive. Les \textbf{R}éplicons \textbf{E}xtra-\textbf{C}hromosomiques \textbf{E}ssentiels sont de plus caractérisés comme marqueurs témoignant de la diversité et de l'évolution des mécanismes génétiques permettant l'intégration de réplicons dans le génome stable, attestant ainsi de la continuité du matériel génomique.
 
 }
 \newpage
@@ -301,9 +301,8 @@ $gr$& Granularité de l'algorithme TRIBE-MCL\\[0.2cm]
 
 \mainmatter % Begin numeric (1,2,3...) page numbering
 \pagestyle{fancy} % Return the page headers back to the "fancy" style
-
+\addtotoc{Introduction}
 \input{Chapters/intro}
-
 \input{Chapters/Chapter1-bl}
 \input{Chapters/Chapter2-bl}
 \input{Chapters/Chapter3-bl}
@@ -319,10 +318,10 @@ $gr$& Granularité de l'algorithme TRIBE-MCL\\[0.2cm]
 
 \label{Bibliography}
 
-\lhead{\emph{Bibliography}} % Change the page header to say "Bibliography"
+\lhead{\emph{Bibliographie}} % Change the page header to say "Bibliography"
 
 \bibliographystyle{chicago} % Use the "unsrtnat" BibTeX style for formatting the Bibliography
-
+\addtotoc{Biliographie}
  \bibliography{publicollection23012014} % The references (bibliography) information are stored in the file named "Bibliography.bib"
 
 %----------------------------------------------------------------------------------------
