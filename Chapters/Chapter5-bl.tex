@@ -519,7 +519,7 @@ Concernant les RECE, on peut observer que:
         Les méthodes de réduction de dimensions testées sont les mêmes que précédemment (Table \ref{tabprojec}) avec $q$, le nombre de dimensions, variable. Soient $Cl$ un clustering de $C$ clusters, $V$ un ensemble d'observations et $d$ une distance. La Table \ref{tabalgoclust} introduit brièvement les principaux algorithmes de clustering utilisés
 .
 
-\begin{longtable}{ @{\hspace{-2.7cm}} >{\bfseries}p{0.15\textwidth}|>{\small}p{\textwidth}}
+\begin{longtable}{ @{\hspace{-2cm}} >{\bfseries}p{0.15\textwidth}@{\hspace{1cm}}|>{\small}p{\textwidth}}
       \caption[Algorithmes de clustering utilisés]{Principaux algorithmes de clustering utilisés dans l'analyse des données.}\\ \label{tabalgoclust}
       K-Means & \citep{hartigan1975clustering,hartigan1979algorithm} Algorithme de clustering des plus populaires. Le principe original consiste à minimiser l'erreur $E=\sum_{C \in Cl}\sum_{r \in C} d(v_{r},\bar{v}^{C})$. Les paramètres de l'algorithme étant la distance $d$, le nombre de clusters $k$, le nombre d'itérations et d'exécutions de l'algorithme et son mode de convergence. De nombreuses variantes de l'algorithme existent \citep{gan2007data}.
 	\\[0.4cm]
