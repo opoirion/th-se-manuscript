@@ -110,38 +110,40 @@
 
 \begin{titlepage}
 %\titleGP
-
+\vspace*{-1cm}
+\begin{flushright}
+ N$^{\circ}$ordre : 2014-33
+ \end{flushright}
 \begin{center}
-\textsc{\LARGE Université de Lyon}\\[0.2cm]
-\textsc{\LARGE \univname}\\[1.5cm] % University name
-\textsc{\Large Thèse de doctorat}\\[0.5cm] % Thesis type
 
-\HRule\\[-0.4cm]\HRule\\[0.4cm] % Horizontal line
-{\huge \bfseries \ttitle}\\[0.4cm] % Thesis title
-\HRule\\[-0.4cm]\HRule\\[1.5cm] % Horizontal line
-\begin{center}
-\begin{minipage}{0.5\textwidth}
-\large
-\emph{\textbf{\Large Olivier POIRION}}\\\\
-% \href{http://www.team.com}{\authornames} % Author name - remove the \href bracket to remove the link
-\textnormal{Direction:}\\
-\emph{\textnormal{Bénédicte Lafay}} \\
-\emph{\textnormal{Laurent Krähenbühl}}\\
-% \href{http://www.jamessmith.com}{\supname} % Supervisor name - remove the \href bracket to remove the link  
-\end{minipage}\\[3cm]
-\end{center}
-\deptname
-%\large \textit{Thèse présentée dans le respect des exigences\\ pour le diplôme de \degreename}\\[1cm] % University requirement text
-%\textit{dans le}\\[0.4cm]
-\href{http://edeea.ec-lyon.fr/}{École Doctorale EEA}\\[2cm] % Research group name and department name
- 
-{\large \today}\\[4cm] % Date
-%\includegraphics{Logo} % University/department logo - uncomment to place it
+\textsc{\LARGE THÈSE DE L'UNIVERSITÉ DE LYON}\\[0.2cm]
+\textsc{\Large \textit{délivrée par l'École Centrale de Lyon}}\\[1.5cm] % University name
+\textsc{\textit{pour l'obtention du grade de}}\\[0.4cm] % Thesis type
+\textsc{\Large DOCTEUR}\\[0.4cm] % Thesis type
+\textsc{Spécialité ``Ingénierie pour le Vivant''}\\[0.4cm]
+École Doctorale Électronique, Électrotechnique, Automatique de Lyon\\[1cm]
+\textit{Soutenue publiquement le 28 novembre 2014 par}\\[1cm]
+\textsc{\Large M. Olivier POIRION}\\[1cm]
+
+{\LARGE \bfseries \textsc{\ttitle}}\\[2cm] % Thesis title
+{\textit{\textsc{devant le jury composé de:}}}\\[0.7cm]
+\begin{tabular}{ll}
+Dr Davide LANE (LMGE, Toulouse) & Président\\
+Dr Éric BAPTESTE (Évolution Paris Seine) & Rapporteur\\
+Dr Christophe DESSIMOZ (University College, London) & Rapporteur\\
+Dr Philippe BESSIÈRES (MIG-INRA, Jouy en Josas) & Examinateur\\
+Dr Xavier NESME (Écologie Microbienne, Lyon) & Examinateur\\
+Dr Hervé PHILIPPE (CTMB, Moulis) & Examinateur\\
+Dr Laurent KRÄHENBÜHL (Ampère, Écully) & Directeur de thèse\\
+Dr Bénédicte LAFAY (Ampère, Écully) & Direction scientifique
+\end{tabular}
+\\[1.5cm]
+\textit{\textsc{Laboratoire Ampère\\ CNRS UMR5005-ECL-INSA-UCBL}}
 \end{center}
 
 \end{titlepage}
-\clearpage
-\clearpage
+\pagebreak
+\pagebreak
 
 %----------------------------------------------------------------------------------------
 %	DECLARATION PAGE
@@ -177,8 +179,11 @@ The relationships between replicons, with reference to their genetic information
 %	ACKNOWLEDGEMENTS
 %----------------------------------------------------------------------------------------
 \setstretch{1.3} % Reset the line-spacing to 1.3 for body text (if it has changed)
-\acknowledgements{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
-Je tiens à remercier mes encadrants de thèse: Bénédicte Lafay et Laurent Krähenbühl, les membres de mon jury, ma famille et, enfin, mes amis.
+\acknowledgements{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, 
+\begin{center}
+\vspace{5cm}
+\textsc{\textit{Je tiens à remercier mes encadrants de thèse: Bénédicte Lafay et Laurent Krähenbühl, les membres de mon jury, ma famille et, enfin, mes amis.}}
+\end{center}
 }
 \clearpage % Start a new page
 
@@ -334,6 +339,7 @@ $gr$& Granularité de l'algorithme TRIBE-MCL\\[0.2cm]
 
 % Include the appendices of the thesis as separate files from the Appendices folder
 % Uncomment the lines as you write the Appendices
+
 \input{Appendices/AppendixA}
 \input{Appendices/AppendixB}
 \input{Appendices/AppendixC}
@@ -341,7 +347,6 @@ $gr$& Granularité de l'algorithme TRIBE-MCL\\[0.2cm]
 \setlength{\evensidemargin}{4cm}
 \input{Appendices/AppendixD}
 \addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
-
 \backmatter
 
 \end{document}  

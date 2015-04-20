@@ -412,7 +412,7 @@
 \btypeout{Remerciements}
 \addtotoc{Remerciements}
 \thispagestyle{plain}
-\begin{center}{\huge{\textit{Remerciements}} \par}\end{center}
+\begin{center}{\huge{\textit{}} \par}\end{center}
 {\normalsize #1}
 \vfil\vfil\null
 
