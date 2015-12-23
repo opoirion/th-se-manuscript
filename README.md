@@ -1,2 +1,2 @@
-# th-se-manuscript
+# thèse-manuscript
 manuscript thèse (fr)
